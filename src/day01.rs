@@ -1,7 +1,7 @@
+use crate::advent::Advent;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{self, BufRead};
-use crate::advent::Advent;
 
 pub fn run(advent: Advent) {
     let path = advent.path();
@@ -10,7 +10,7 @@ pub fn run(advent: Advent) {
     part_2(parsed);
 }
 
-fn part_1(parsed: (Vec<i32>, Vec<i32>))  {
+fn part_1(parsed: (Vec<i32>, Vec<i32>)) {
     let (mut list_a, mut list_b) = parsed;
 
     list_a.sort();
