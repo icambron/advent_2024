@@ -4,11 +4,14 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 fn main() {
-    parse_args_or_panic().run("day_1", part_1, part_2);
+    let path = parse_args_or_panic().path("day_1");
+    let parsed = parse_file(&path).expect("Failed to parse file");
+    part_1(parsed.clone());
+    part_2(parsed);
 }
 
-fn part_1(file: &str) {
-    let (mut list_a, mut list_b) = parse_file(file).expect("Failed to parse file");
+fn part_1(parsed: (Vec<i32>, Vec<i32>))  {
+    let (mut list_a, mut list_b) = parsed;
 
     list_a.sort();
     list_b.sort();
@@ -19,11 +22,11 @@ fn part_1(file: &str) {
             sum + (b - a).abs()
         });
 
-    println!("{}", sum);
+    println!("Part 1: {}", sum);
 }
 
-fn part_2(file: &str) {
-    let (list_a, list_b) = parse_file(file).expect("Failed to parse file");
+fn part_2(parsed: (Vec<i32>, Vec<i32>)) {
+    let (list_a, list_b) = parsed;
 
     let mut hash = BTreeMap::new();
     for n in list_b.iter() {
@@ -37,7 +40,7 @@ fn part_2(file: &str) {
         sum + similarity * val
     });
 
-    println!("{}", sum_similarity);
+    println!("Part 2: {}", sum_similarity);
 }
 
 fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), Error> {
