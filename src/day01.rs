@@ -1,10 +1,10 @@
-use common::parse_args_or_panic;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{self, BufRead};
+use crate::advent::Advent;
 
-fn main() {
-    let path = parse_args_or_panic().path(1);
+pub fn run(advent: Advent) {
+    let path = advent.path();
     let parsed = parse_file(&path).expect("Failed to parse file");
     part_1(parsed.clone());
     part_2(parsed);

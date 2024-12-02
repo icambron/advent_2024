@@ -1,10 +1,11 @@
 pub struct Advent {
+    pub day: u8,
     pub input: Input,
 }
 
 impl Advent {
-    pub fn path(&self, day: u8) -> String {
-        let day_str = format!("{:02}", day);
+    pub fn path(&self) -> String {
+        let day_str = format!("{:02}", self.day);
         match self.input {
             Input::Sample => format!("files/{}/{}.txt", "samples", day_str),
             Input::Real => format!("files/{}/{}.txt", "inputs", day_str),
@@ -44,6 +45,7 @@ pub fn parse_args_or_panic() -> Advent {
 pub fn parse_args() -> Result<Advent, pico_args::Error> {
     let mut pargs = pico_args::Arguments::from_env();
     Ok(Advent {
+        day: pargs.opt_value_from_str(["-d", "--day"])?.unwrap_or(1),
         input: Input::new(pargs.contains(["-s", "--sample"])),
     })
 }

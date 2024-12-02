@@ -3,18 +3,10 @@
 version = 3
 
 [[package]]
-name = "common"
+name = "advent_2024"
 version = "0.1.0"
 dependencies = [
  "pico-args",
- "thiserror",
-]
-
-[[package]]
-name = "day_1"
-version = "0.1.0"
-dependencies = [
- "common",
  "thiserror",
 ]
 

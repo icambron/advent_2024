@@ -1,3 +1,8 @@
-[workspace]
-members = ["common", "day_1"]
-resolver = "2"
+[package]
+name = "advent_2024"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pico-args = { version = "0.5.0", features = ["short-space-opt", "combined-flags"] }
+thiserror = "2.0.3"
