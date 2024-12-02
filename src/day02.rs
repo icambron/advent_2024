@@ -2,6 +2,7 @@ use crate::advent::Advent;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
+use anyhow::anyhow;
 
 pub fn run(advent: Advent) {
     let parsed = parse_file(&advent.path()).expect("Failed to parse file");
@@ -74,7 +75,7 @@ enum ReportState {
     Down(i8),
 }
 
-fn parse_file(file: &str) -> Result<Vec<Vec<i8>>, Error> {
+fn parse_file(file: &str) -> Result<Vec<Vec<i8>>, anyhow::Error> {
     let file = File::open(file)?;
     let lines = io::BufReader::new(file).lines();
     let mut reports = Vec::with_capacity(1000);
@@ -82,16 +83,8 @@ fn parse_file(file: &str) -> Result<Vec<Vec<i8>>, Error> {
         let levels: Vec<i8> = line.split_whitespace()
             .map(|s| s.parse::<i8>())
             .collect::<Result<_, _>>()
-            .map_err(|_| Error::BadLine(line.clone()))?;
+            .map_err(|_| anyhow!(line))?;
         reports.push(levels);
     }
     Ok(reports)
-}
-
-#[derive(Debug, thiserror::Error)]
-enum Error {
-    #[error(transparent)]
-    Io(#[from] io::Error),
-    #[error("Bad line: {0}")]
-    BadLine(String),
 }

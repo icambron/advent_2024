@@ -2,14 +2,15 @@ pub mod advent;
 mod day01;
 mod day02;
 
-use advent::*;
-
+use advent::Advent;
 
 fn main() {
-    let advent = parse_args_or_panic();
-    match advent.day {
-        1 => day01::run(advent),
-        2 => day02::run(advent),
-        _ => eprintln!("Day {} not implemented", advent.day),
-    }
+    let advent = Advent::parse_args_or_panic();
+    let f = match advent.day {
+        1 => day01::run,
+        2 => day02::run,
+        _ => panic!("Day {} not implemented", advent.day),
+    };
+    
+    f(advent);
 }

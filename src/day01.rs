@@ -2,6 +2,7 @@ use crate::advent::Advent;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{self, BufRead};
+use anyhow::anyhow;
 
 pub fn run(advent: Advent) {
     let path = advent.path();
@@ -43,7 +44,7 @@ fn part_2(parsed: (Vec<i32>, Vec<i32>)) {
     println!("Part 2: {}", sum_similarity);
 }
 
-fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), Error> {
+fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), anyhow::Error> {
     let file = File::open(file)?;
     let lines = io::BufReader::new(file).lines();
     let mut list_a = Vec::with_capacity(1000);
@@ -53,23 +54,14 @@ fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), Error> {
         let numbers: Vec<i32> = line.split_whitespace()
             .map(|s| s.parse::<i32>())
             .collect::<Result<_, _>>()
-            .map_err(|_| Error::BadLine(line.clone()))?;
+            .map_err(|_| anyhow!("Bad line {}", line))?;
         if numbers.len() == 2 {
             list_a.push(numbers[0]);
             list_b.push(numbers[1]);
         } else {
-            return Err(Error::BadLine(line));
+            return Err(anyhow!("Bad line {}", line));
         }
     }
 
     Ok((list_a, list_b))
-}
-
-#[derive(Debug, thiserror::Error)]
-enum Error {
-    #[error(transparent)]
-    Io(#[from] io::Error),
-
-    #[error("Bad line: {0}")]
-    BadLine(String),
 }
