@@ -12,26 +12,17 @@ pub fn run(advent: Advent) {
 
 fn part_1(parsed: &[Vec<i8>]) {
     let count_safe = parsed.iter()
-        .fold(0, |acc, report| {
-            if is_report_safe(report, None) {
-                acc + 1
-            } else {
-                acc
-            }
-        });
+        .filter(|report| is_report_safe(report, None))
+        .count();
 
     println!("Part 1: {}", count_safe);
 }
 
 fn part_2(parsed: &[Vec<i8>]) {
-    let count_safe = parsed.iter().fold(0, |acc, report| {
-        for (i, _) in report.iter().enumerate() {
-            if is_report_safe(report, Some(i)) {
-                return acc + 1;
-            }
-        }
-        acc
-    });
+    let count_safe = parsed.iter().filter(|report| {
+        report.iter().enumerate().any(|(i, _)| is_report_safe(report, Some(i)))
+    }).count();
+
     println!("Part 2: {}", count_safe);
 }
 
@@ -67,7 +58,6 @@ fn ok_lower(prev: i8, level: i8) -> bool {
     level < prev && level >= prev - 3
 }
 
-#[derive(PartialEq, Eq)]
 enum ReportState {
     Start,
     First(i8),

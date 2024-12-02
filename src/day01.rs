@@ -5,30 +5,21 @@ use std::io::{self, BufRead};
 use anyhow::anyhow;
 
 pub fn run(advent: Advent) {
-    let path = advent.path();
-    let parsed = parse_file(&path).expect("Failed to parse file");
-    part_1(parsed.clone());
-    part_2(parsed);
+    let (list_a, list_b) = parse_file(&advent.path()).expect("Failed to parse file");
+    part_1(&list_a, &list_b);
+    part_2(&list_a, &list_b);
 }
 
-fn part_1(parsed: (Vec<i32>, Vec<i32>)) {
-    let (mut list_a, mut list_b) = parsed;
-
-    list_a.sort();
-    list_b.sort();
-
+fn part_1(list_a: &[i32], list_b: &[i32]) {
     let sum = list_a.iter()
         .zip(list_b.iter())
         .fold(0, |sum, (a, b)| {
             sum + (b - a).abs()
         });
-
     println!("Part 1: {}", sum);
 }
 
-fn part_2(parsed: (Vec<i32>, Vec<i32>)) {
-    let (list_a, list_b) = parsed;
-
+fn part_2(list_a: &[i32], list_b: &[i32]) {
     let mut hash = BTreeMap::new();
     for n in list_b.iter() {
         hash.entry(n)
@@ -62,6 +53,9 @@ fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), anyhow::Error> {
             return Err(anyhow!("Bad line {}", line));
         }
     }
+
+    list_a.sort_unstable();
+    list_b.sort_unstable();
 
     Ok((list_a, list_b))
 }

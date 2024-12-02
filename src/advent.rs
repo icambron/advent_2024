@@ -11,7 +11,7 @@ impl Advent {
             Input::Real => format!("files/{}/{}.txt", "inputs", day_str),
         }
     }
-    
+
     pub fn parse_args() -> Result<Self, anyhow::Error> {
         let mut pargs = pico_args::Arguments::from_env();
         Ok(Advent {
@@ -19,7 +19,7 @@ impl Advent {
             input: Input::new(pargs.contains(["-s", "--sample"])),
         })
     }
-    
+
     pub fn parse_args_or_panic() -> Self {
         Self::parse_args().unwrap_or_else(|e| {
             panic!("{}", e);
