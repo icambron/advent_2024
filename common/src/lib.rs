@@ -3,11 +3,11 @@ pub struct Advent {
 }
 
 impl Advent {
-    pub fn path(&self, prefix: &str) -> String {
-        let dir = format!("{}/{}", prefix, "resources");
+    pub fn path(&self, day: u8) -> String {
+        let day_str = format!("{:02}", day);
         match self.input {
-            Input::Sample => format!("{}/{}", dir, "sample.txt"),
-            Input::Real => format!("{}/{}", dir, "input.txt"),
+            Input::Sample => format!("files/{}/{}.txt", "samples", day_str),
+            Input::Real => format!("files/{}/{}.txt", "inputs", day_str),
         }
     }
 }

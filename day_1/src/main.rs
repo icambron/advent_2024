@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 fn main() {
-    let path = parse_args_or_panic().path("day_1");
+    let path = parse_args_or_panic().path(1);
     let parsed = parse_file(&path).expect("Failed to parse file");
     part_1(parsed.clone());
     part_2(parsed);
