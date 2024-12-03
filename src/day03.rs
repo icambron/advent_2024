@@ -1,7 +1,7 @@
+use crate::advent::Advent;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
-use crate::advent::Advent;
 
 pub fn run(advent: Advent) {
     let file = parse_file(&advent.path()).expect("Failed to open file");
@@ -10,7 +10,7 @@ pub fn run(advent: Advent) {
 }
 
 fn part_1(ops: &[Op]) {
-   let sum = sum_all(ops, false);
+    let sum = sum_all(ops, false);
     println!("Part 1: {}", sum);
 }
 
@@ -69,5 +69,5 @@ fn parse_line(line: &str) -> Vec<Op> {
 enum Op {
     Mul(i64, i64),
     Do,
-    Dont
+    Dont,
 }

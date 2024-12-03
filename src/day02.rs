@@ -1,8 +1,8 @@
 use crate::advent::Advent;
+use anyhow::anyhow;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
-use anyhow::anyhow;
 
 pub fn run(advent: Advent) {
     let parsed = parse_file(&advent.path()).expect("Failed to parse file");

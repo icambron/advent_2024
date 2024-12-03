@@ -1,8 +1,8 @@
 use crate::advent::Advent;
+use anyhow::anyhow;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{self, BufRead};
-use anyhow::anyhow;
 
 pub fn run(advent: Advent) {
     let (list_a, list_b) = parse_file(&advent.path()).expect("Failed to parse file");

@@ -13,6 +13,6 @@ fn main() {
         3 => day03::run,
         _ => panic!("Day {} not implemented", advent.day),
     };
-    
+
     f(advent);
 }
