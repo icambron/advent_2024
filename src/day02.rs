@@ -1,8 +1,8 @@
 use crate::advent::Advent;
+use anyhow::anyhow;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
-use anyhow::anyhow;
 
 pub fn run(advent: Advent) {
     let parsed = parse_file(&advent.path()).expect("Failed to parse file");
@@ -11,7 +11,8 @@ pub fn run(advent: Advent) {
 }
 
 fn part_1(parsed: &[Vec<i8>]) {
-    let count_safe = parsed.iter()
+    let count_safe = parsed
+        .iter()
         .filter(|report| is_report_safe(report, None))
         .count();
 
@@ -19,9 +20,15 @@ fn part_1(parsed: &[Vec<i8>]) {
 }
 
 fn part_2(parsed: &[Vec<i8>]) {
-    let count_safe = parsed.iter().filter(|report| {
-        report.iter().enumerate().any(|(i, _)| is_report_safe(report, Some(i)))
-    }).count();
+    let count_safe = parsed
+        .iter()
+        .filter(|report| {
+            report
+                .iter()
+                .enumerate()
+                .any(|(i, _)| is_report_safe(report, Some(i)))
+        })
+        .count();
 
     println!("Part 2: {}", count_safe);
 }
@@ -36,15 +43,29 @@ fn is_report_safe(report: &[i8], exclude_index: Option<usize>) -> bool {
 
         state = match state {
             ReportState::Start => ReportState::First(level),
-            ReportState::Up(prev) => if ok_higher(prev, level) { ReportState::Up(level) } else { return false },
-            ReportState::Down(prev) => if ok_lower(prev, level) { ReportState::Down(level) } else { return false },
-            ReportState::First(prev) => if ok_higher(prev, level) {
-                ReportState::Up(level)
-            } else if ok_lower(prev, level) {
-                ReportState::Down(level)
-            } else {
-                return false
-            },
+            ReportState::Up(prev) => {
+                if ok_higher(prev, level) {
+                    ReportState::Up(level)
+                } else {
+                    return false;
+                }
+            }
+            ReportState::Down(prev) => {
+                if ok_lower(prev, level) {
+                    ReportState::Down(level)
+                } else {
+                    return false;
+                }
+            }
+            ReportState::First(prev) => {
+                if ok_higher(prev, level) {
+                    ReportState::Up(level)
+                } else if ok_lower(prev, level) {
+                    ReportState::Down(level)
+                } else {
+                    return false;
+                }
+            }
         };
     }
     true
@@ -70,7 +91,8 @@ fn parse_file(file: &str) -> Result<Vec<Vec<i8>>, anyhow::Error> {
     let lines = io::BufReader::new(file).lines();
     let mut reports = Vec::with_capacity(1000);
     for line in lines.map_while(|l| l.ok()) {
-        let levels: Vec<i8> = line.split_whitespace()
+        let levels: Vec<i8> = line
+            .split_whitespace()
             .map(|s| s.parse::<i8>())
             .collect::<Result<_, _>>()
             .map_err(|_| anyhow!(line))?;

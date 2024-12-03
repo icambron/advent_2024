@@ -1,8 +1,8 @@
 use crate::advent::Advent;
+use anyhow::anyhow;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{self, BufRead};
-use anyhow::anyhow;
 
 pub fn run(advent: Advent) {
     let (list_a, list_b) = parse_file(&advent.path()).expect("Failed to parse file");
@@ -11,20 +11,17 @@ pub fn run(advent: Advent) {
 }
 
 fn part_1(list_a: &[i32], list_b: &[i32]) {
-    let sum = list_a.iter()
+    let sum = list_a
+        .iter()
         .zip(list_b.iter())
-        .fold(0, |sum, (a, b)| {
-            sum + (b - a).abs()
-        });
+        .fold(0, |sum, (a, b)| sum + (b - a).abs());
     println!("Part 1: {}", sum);
 }
 
 fn part_2(list_a: &[i32], list_b: &[i32]) {
     let mut hash = BTreeMap::new();
     for n in list_b.iter() {
-        hash.entry(n)
-            .and_modify(|e| *e += 1)
-            .or_insert(1);
+        hash.entry(n).and_modify(|e| *e += 1).or_insert(1);
     }
 
     let sum_similarity = list_a.iter().fold(0, |sum, val| {
@@ -42,7 +39,8 @@ fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), anyhow::Error> {
     let mut list_b = Vec::with_capacity(1000);
 
     for line in lines.map_while(|l| l.ok()) {
-        let numbers: Vec<i32> = line.split_whitespace()
+        let numbers: Vec<i32> = line
+            .split_whitespace()
             .map(|s| s.parse::<i32>())
             .collect::<Result<_, _>>()
             .map_err(|_| anyhow!("Bad line {}", line))?;
