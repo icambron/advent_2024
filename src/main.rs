@@ -7,7 +7,7 @@ mod day04;
 use advent::Advent;
 
 fn main() {
-    let advent = Advent::parse_args_or_panic();
+    let advent = Advent::parse_args();
     let f = match advent.day {
         1 => day01::run,
         2 => day02::run,

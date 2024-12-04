@@ -1,11 +1,10 @@
 use crate::advent::Advent;
-use anyhow::anyhow;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 
 pub fn run(advent: Advent) {
-    let parsed = parse_file(&advent.path()).expect("Failed to parse file");
+    let parsed = parse_file(&advent.path());
     part_1(&parsed);
     part_2(&parsed);
 }
@@ -86,17 +85,16 @@ enum ReportState {
     Down(i8),
 }
 
-fn parse_file(file: &str) -> Result<Vec<Vec<i8>>, anyhow::Error> {
-    let file = File::open(file)?;
+fn parse_file(file: &str) -> Vec<Vec<i8>> {
+    let file = File::open(file).expect("Should be able to open file");
     let lines = io::BufReader::new(file).lines();
     let mut reports = Vec::with_capacity(1000);
     for line in lines.map_while(|l| l.ok()) {
         let levels: Vec<i8> = line
             .split_whitespace()
-            .map(|s| s.parse::<i8>())
-            .collect::<Result<_, _>>()
-            .map_err(|_| anyhow!(line))?;
+            .map(|s| s.parse::<i8>().expect("Text should be a number"))
+            .collect();
         reports.push(levels);
     }
-    Ok(reports)
+    reports
 }

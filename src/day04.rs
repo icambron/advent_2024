@@ -4,7 +4,7 @@ use std::io;
 use std::io::BufRead;
 
 pub fn run(advent: Advent) {
-    let parsed = parse_file(&advent.path()).expect("Failed to parse file");
+    let parsed = parse_file(&advent.path());
     part_1(&parsed);
     part_2(&parsed);
 }
@@ -88,8 +88,8 @@ fn find_all(parsed: &[Vec<char>], target: char) -> Vec<Pos> {
     
 }
 
-fn parse_file(file: &str) -> Result<Vec<Vec<char>>, anyhow::Error> {
-    let file = File::open(file)?;
+fn parse_file(file: &str) -> Vec<Vec<char>> {
+    let file = File::open(file).expect("Should be able to open file");
     let lines = io::BufReader::new(file).lines();
     let mut parsed = Vec::new();
     for line in lines.map_while(|l| l.ok()) {
@@ -97,7 +97,7 @@ fn parse_file(file: &str) -> Result<Vec<Vec<char>>, anyhow::Error> {
         parsed.push(row);
     }
 
-    Ok(parsed)
+    parsed
 }
 
 #[derive(Debug)]

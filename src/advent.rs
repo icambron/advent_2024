@@ -12,18 +12,12 @@ impl Advent {
         }
     }
 
-    pub fn parse_args() -> Result<Self, anyhow::Error> {
+    pub fn parse_args() -> Self {
         let mut pargs = pico_args::Arguments::from_env();
-        Ok(Advent {
-            day: pargs.opt_value_from_str(["-d", "--day"])?.unwrap_or(1),
+        Advent {
+            day: pargs.opt_value_from_str(["-d", "--day"]).expect("Should provide a --day argument").unwrap_or(1),
             input: Input::new(pargs.contains(["-s", "--sample"])),
-        })
-    }
-
-    pub fn parse_args_or_panic() -> Self {
-        Self::parse_args().unwrap_or_else(|e| {
-            panic!("{}", e);
-        })
+        }
     }
 }
 

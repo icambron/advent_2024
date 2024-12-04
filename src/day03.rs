@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::read_to_string;
 
 pub fn run(advent: Advent) {
-    let file = parse_file(&advent.path()).expect("Failed to open file");
+    let file = parse_file(&advent.path());
     part_1(&file);
     part_2(&file);
 }
@@ -34,11 +34,11 @@ fn sum_all(ops: &[Op], allow_disable: bool) -> i64 {
     sum
 }
 
-fn parse_file(file: &str) -> Result<Vec<Op>, anyhow::Error> {
-    let file = File::open(file)?;
-    let s = read_to_string(file)?;
-    let re = Regex::new(r"(mul\((\d+),(\d+)\)|do\(\)|don't\(\))")?;
-    Ok(re
+fn parse_file(file: &str) -> Vec<Op> {
+    let file = File::open(file).expect("Should be able to open file");
+    let s = read_to_string(file).expect("Should be able to read the file as a string");
+    let re = Regex::new(r"(mul\((\d+),(\d+)\)|do\(\)|don't\(\))").unwrap();
+    re
         .captures_iter(&s)
         .map(|cap| {
             match cap.get(1) {
@@ -57,7 +57,7 @@ fn parse_file(file: &str) -> Result<Vec<Op>, anyhow::Error> {
                 None => panic!("invalid state"),
             }
         })
-        .collect())
+        .collect()
 }
 
 #[derive(Debug)]

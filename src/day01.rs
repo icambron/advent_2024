@@ -1,11 +1,10 @@
 use crate::advent::Advent;
-use anyhow::anyhow;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 
 pub fn run(advent: Advent) {
-    let (list_a, list_b) = parse_file(&advent.path()).expect("Failed to parse file");
+    let (list_a, list_b) = parse_file(&advent.path());
     part_1(&list_a, &list_b);
     part_2(&list_a, &list_b);
 }
@@ -15,6 +14,7 @@ fn part_1(list_a: &[i32], list_b: &[i32]) {
         .iter()
         .zip(list_b.iter())
         .fold(0, |sum, (a, b)| sum + (b - a).abs());
+    
     println!("Part 1: {}", sum);
 }
 
@@ -32,8 +32,8 @@ fn part_2(list_a: &[i32], list_b: &[i32]) {
     println!("Part 2: {}", sum_similarity);
 }
 
-fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), anyhow::Error> {
-    let file = File::open(file)?;
+fn parse_file(file: &str) -> (Vec<i32>, Vec<i32>) {
+    let file = File::open(file).expect("Should be able to open file");
     let lines = io::BufReader::new(file).lines();
     let mut list_a = Vec::with_capacity(1000);
     let mut list_b = Vec::with_capacity(1000);
@@ -41,19 +41,18 @@ fn parse_file(file: &str) -> Result<(Vec<i32>, Vec<i32>), anyhow::Error> {
     for line in lines.map_while(|l| l.ok()) {
         let numbers: Vec<i32> = line
             .split_whitespace()
-            .map(|s| s.parse::<i32>())
-            .collect::<Result<_, _>>()
-            .map_err(|_| anyhow!("Bad line {}", line))?;
+            .map(|s| s.parse::<i32>().expect("Text should be a number"))
+            .collect();
         if numbers.len() == 2 {
             list_a.push(numbers[0]);
             list_b.push(numbers[1]);
         } else {
-            return Err(anyhow!("Bad line {}", line));
+            panic!("Invalid input");
         }
     }
 
     list_a.sort_unstable();
     list_b.sort_unstable();
 
-    Ok((list_a, list_b))
+    (list_a, list_b)
 }
