@@ -1,7 +1,7 @@
 use crate::advent::Advent;
+use regex::Regex;
 use std::fs::File;
 use std::io::read_to_string;
-use regex::Regex;
 
 pub fn run(advent: Advent) {
     let file = parse_file(&advent.path()).expect("Failed to open file");
