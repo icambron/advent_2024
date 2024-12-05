@@ -28,18 +28,9 @@ fn part_2(parsed: Update) {
         .filter(|page_set| !is_correct(page_set, &parsed.rules))
         .map(|mut page_set| {
             page_set.sort_by(|a, b| {
-                let rule_ab = Rule {
-                    first: *a,
-                    second: *b,
-                };
-                let rule_ba = Rule {
-                    first: *b,
-                    second: *a,
-                };
-
-                if parsed.rules.contains(&rule_ab) {
+                if parsed.rules.contains(&(*a, *b)) {
                     std::cmp::Ordering::Less
-                } else if parsed.rules.contains(&rule_ba) {
+                } else if parsed.rules.contains(&(*b, *a)) {
                     std::cmp::Ordering::Greater
                 } else {
                     std::cmp::Ordering::Equal
@@ -53,15 +44,15 @@ fn part_2(parsed: Update) {
     println!("Part 2: {}", sum);
 }
 
-fn is_correct(page_set: &[usize], rules: &HashSet<Rule>) -> bool {
+fn is_correct(page_set: &[usize], rules: &HashSet<(usize, usize)>) -> bool {
     let page_map = page_set
         .iter()
         .enumerate()
         .map(|(i, p)| (p, i))
         .collect::<BTreeMap<_, _>>();
     for rule in rules {
-        if let Some(first) = page_map.get(&rule.first) {
-            if let Some(second) = page_map.get(&rule.second) {
+        if let Some(first) = page_map.get(&rule.0) {
+            if let Some(second) = page_map.get(&rule.1) {
                 if first > second {
                     return false;
                 }
@@ -90,7 +81,7 @@ fn parse_file(file: &str) -> Update {
             let mut parts = line.split("|");
             let first = parts.next().unwrap().parse().unwrap();
             let second = parts.next().unwrap().parse().unwrap();
-            rules.insert(Rule { first, second });
+            rules.insert((first, second));
         }
     }
 
@@ -99,12 +90,6 @@ fn parse_file(file: &str) -> Update {
 
 #[derive(Debug)]
 struct Update {
-    rules: HashSet<Rule>,
+    rules: HashSet<(usize, usize)>,
     pages: Vec<Vec<usize>>,
-}
-
-#[derive(Debug, Hash, PartialEq, Eq)]
-struct Rule {
-    first: usize,
-    second: usize,
 }
