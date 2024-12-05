@@ -14,14 +14,14 @@ fn part_1(parsed: &[Vec<char>]) {
     const MAS: &str = "MAS";
 
     let all_directions = vec![
-        Dir::new(0, 1), // down
-        Dir::new(0, -1), // up
-        Dir::new(-1, 0), // left
-        Dir::new(1, 0), // right
-        Dir::new(1, 1), // down right
-        Dir::new(1, -1), // up right
-        Dir::new(-1, 1), // down left
-        Dir::new(-1, -1)  // up left
+        Dir::new(0, 1),   // down
+        Dir::new(0, -1),  // up
+        Dir::new(-1, 0),  // left
+        Dir::new(1, 0),   // right
+        Dir::new(1, 1),   // down right
+        Dir::new(1, -1),  // up right
+        Dir::new(-1, 1),  // down left
+        Dir::new(-1, -1), // up left
     ];
 
     let mut xmases = 0;
@@ -65,27 +65,32 @@ fn part_2(parsed: &[Vec<char>]) {
     let left_down = Dir::new(-1, 1);
     let right_up = Dir::new(1, -1);
 
-    let xmases = find_all(parsed, 'A').iter().filter(|pos| {
-        let right_down_to_left_up = (pos.travel(&right_down), pos.travel(&left_up));
-        let left_up_to_right_down = (pos.travel(&left_down), pos.travel(&right_up));
-        is_mas(parsed, right_down_to_left_up) && is_mas(parsed, left_up_to_right_down)
-    }).count();
+    let xmases = find_all(parsed, 'A')
+        .iter()
+        .filter(|pos| {
+            let right_down_to_left_up = (pos.travel(&right_down), pos.travel(&left_up));
+            let left_up_to_right_down = (pos.travel(&left_down), pos.travel(&right_up));
+            is_mas(parsed, right_down_to_left_up) && is_mas(parsed, left_up_to_right_down)
+        })
+        .count();
 
     println!("Part 2: {}", xmases);
 }
 
 fn find_all(parsed: &[Vec<char>], target: char) -> Vec<Pos> {
-    
-    parsed.iter().enumerate().flat_map(|(y, row)| {
-        row.iter().enumerate().filter_map(move |(x, c)| {
-            if *c == target {
-                Some(Pos { x, y })
-            } else {
-                None
-            }
+    parsed
+        .iter()
+        .enumerate()
+        .flat_map(|(y, row)| {
+            row.iter().enumerate().filter_map(move |(x, c)| {
+                if *c == target {
+                    Some(Pos { x, y })
+                } else {
+                    None
+                }
+            })
         })
-    }).collect()
-    
+        .collect()
 }
 
 fn parse_file(file: &str) -> Vec<Vec<char>> {

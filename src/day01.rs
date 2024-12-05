@@ -14,7 +14,7 @@ fn part_1(list_a: &[i32], list_b: &[i32]) {
         .iter()
         .zip(list_b.iter())
         .fold(0, |sum, (a, b)| sum + (b - a).abs());
-    
+
     println!("Part 1: {}", sum);
 }
 

@@ -15,7 +15,10 @@ impl Advent {
     pub fn parse_args() -> Self {
         let mut pargs = pico_args::Arguments::from_env();
         Advent {
-            day: pargs.opt_value_from_str(["-d", "--day"]).expect("Should provide a --day argument").unwrap_or(1),
+            day: pargs
+                .opt_value_from_str(["-d", "--day"])
+                .expect("Should provide a --day argument")
+                .unwrap_or(1),
             input: Input::new(pargs.contains(["-s", "--sample"])),
         }
     }
