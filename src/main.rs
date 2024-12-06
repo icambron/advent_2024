@@ -10,6 +10,7 @@ use advent::Advent;
 
 fn main() {
     let advent = Advent::parse_args();
+    let time = std::time::Instant::now();
     let f = match advent.day {
         1 => day01::run,
         2 => day02::run,
@@ -21,4 +22,5 @@ fn main() {
     };
 
     f(advent);
+    println!("Time: {:?}", time.elapsed());
 }

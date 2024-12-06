@@ -5,32 +5,35 @@ use std::io::BufRead;
 use crate::advent::Advent;
 
 pub fn run(advent: Advent) {
-    let (map, guard) = parse_input(&advent.path());
-    let candidate_pos = part_1(&map, guard.clone());
-    part_2(&map, guard, candidate_pos);
+    let (grid, guard) = parse_input(&advent.path());
+    let candidate_pos = part_1(&grid, guard.clone());
+    part_2(&grid, guard, candidate_pos);
 }
 
-fn part_1(map: &Vec<Vec<Square>>, mut guard: Guard) -> HashSet<Pos> {
+fn part_1(grid: &Grid, mut guard: Guard) -> HashSet<Pos> {
     let mut visited = HashSet::new();
-    
-    while guard.step(map, &None) {
+
+    while guard.step(grid, &None) {
         visited.insert(guard.pos.clone());
     }
 
     println!("Part 1: {}", visited.len());
-    
+
     visited
 }
 
-fn part_2(map: &Vec<Vec<Square>>, guard: Guard, candidate_pos: HashSet<Pos>) {
-    
+fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) {
+
     let mut obstacles_that_worked = 0;
-    
+
+    let mut i = 1;
+
+    // a hashset was way too slow, switched to a 1-d vec of dir; only need to store last dir because can only loop in rectangles
+    // ideally, we'd integrate this into the grid to avoid the second lookup, but that looked complicated and this is plenty fast
+    let mut visited = vec![(0, Dir::Up); grid.width * grid.height];
+
     for pos in candidate_pos {
-        
-        // a hashset was way too slow, switched to a 2d vec of dir
-        let mut visited = vec![vec![None; map[0].len()]; map.len()];
-        
+
         // can't put a new obstacle in the same place as the guard
         if pos == guard.pos {
             continue;
@@ -38,72 +41,93 @@ fn part_2(map: &Vec<Vec<Square>>, guard: Guard, candidate_pos: HashSet<Pos>) {
 
         let mut new_guard = guard.clone();
         let pos = Some(pos);
-        
-        while new_guard.step(map, &pos) {
-            if let Some(dir) = visited[new_guard.pos.y][new_guard.pos.x] {
-                if dir == new_guard.dir {
-                    obstacles_that_worked += 1;
-                    break;
-                }
+
+        while new_guard.step(grid, &pos) {
+            let (j, dir) = visited.get_mut(new_guard.pos.y * grid.width + new_guard.pos.x).unwrap();
+            if *j == i && *dir == new_guard.dir {
+                obstacles_that_worked += 1;
+                break;
             }
-            
-            visited[new_guard.pos.y][new_guard.pos.x] = Some(new_guard.dir);
+
+            *j = i;
+            *dir = new_guard.dir;
         }
+
+        i += 1;
     }
 
     println!("Part 2: {}", obstacles_that_worked);
 }
 
-fn parse_input(file: &str) -> (Vec<Vec<Square>>, Guard) {
+fn parse_input(file: &str) -> (Grid, Guard) {
     let file = File::open(file).expect("Should be able to open file");
     let lines = io::BufReader::new(file).lines();
     let mut map = Vec::new();
     let mut guard = None;
+    let mut height = 0;
+    let mut width = 0;
     for (y, line) in lines.enumerate().map_while(|(y, l)| l.ok().map(|line| (y, line))) {
-        let mut row = Vec::with_capacity(line.len());
+        height += 1;
+        if width == 0 {
+            width = line.len();
+        }
+
         for (x, c) in line.chars().enumerate() {
-            match c {
-                '#' => { row.push(Square::Obstacle); },
-                '.' => { row.push(Square::Empty); },
+            let square = match c {
+                '#' => { Square::Obstacle },
+                '.' => { Square::Empty },
                 _  => {
-                    row.push(Square::Empty);
                     guard = Some(Guard {
                         dir: Dir::from_str(c),
                         pos: Pos { x, y },
                     });
+                    Square::Empty
                 },
-            }
+            };
+            map.push(square);
         }
-        
-        map.push(row);
     }
-    
+
     if let Some(g) = guard {
-        (map, g)
+        (Grid {
+            width,
+            height,
+            map
+        }, g)
     } else {
         panic!("No guard found");
     }
 }
 
+#[derive(Debug)]
+struct Grid {
+    width: usize,
+    height: usize,
+    map: Vec<Square>,
+}
+
+impl Grid {
+    fn get(&self, pos: &Pos) -> Option<&Square> {
+        self.map.get(pos.y * self.width + pos.x)
+    }
+
+    fn travel(&self, pos: &Pos, dir: &Dir) -> Option<Pos> {
+        let delta = dir.delta();
+        let x = pos.x as i32 + delta.0;
+        let y = pos.y as i32 + delta.1;
+
+        if x < 0 || y < 0 || x >= self.width as i32 || y >= self.height as i32 {
+            return None;
+        }
+
+        Some(Pos { x: x as usize, y: y as usize })
+    }
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 struct Pos {
     x: usize,
     y: usize,
-}
-
-impl Pos {
-    fn travel(&self, dir: &Dir) -> Option<Pos> {
-        let delta = dir.delta();
-        let x = self.x as i32 + delta.0;
-        let y = self.y as i32 + delta.1;
-        
-        if x < 0 || y < 0 {
-            return None;
-        }
-        
-        Some(Pos { x: x as usize, y: y as usize })
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -139,7 +163,7 @@ impl Dir {
             _ => panic!("Invalid character")
         }
     }
-    
+
     fn rotate_right(&self) -> Self {
         match self {
             Dir::Up => Dir::Right,
@@ -157,21 +181,19 @@ struct Guard {
 }
 
 impl Guard {
-    pub fn step(&mut self, map: &Vec<Vec<Square>>, obstacle: &Option<Pos>) -> bool {
-        let new_pos = self.pos.travel(&self.dir);
+    pub fn step(&mut self, grid: &Grid, obstacle: &Option<Pos>) -> bool {
+        let new_pos = grid.travel(&self.pos, &self.dir);
         if let Some(new_pos) = new_pos {
-            
-            let square = if let Some(obstacle) = obstacle {
-                if obstacle == &new_pos {
-                    Some(&Square::Obstacle)
-                } else {
-                    map.get(new_pos.y).and_then(|row| row.get(new_pos.x))
+            if let Some(obstacle) = obstacle {
+                if new_pos == *obstacle {
+                    self.dir = self.dir.rotate_right();
+                    return self.step(grid, &Some(obstacle.clone()))
                 }
-            } else {
-                map.get(new_pos.y).and_then(|row| row.get(new_pos.x))
-            };
+            }
 
-            match square {
+            let found = grid.get(&new_pos);
+
+            match found {
                 None => false,
                 Some(Square::Empty) => {
                     self.pos = new_pos;
@@ -179,10 +201,9 @@ impl Guard {
                 },
                 Some(Square::Obstacle) => {
                     self.dir = self.dir.rotate_right();
-                    self.step(map, obstacle)
+                    self.step(grid, obstacle)
                 }
             }
-            
         } else {
             false
         }
