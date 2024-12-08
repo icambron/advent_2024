@@ -6,6 +6,7 @@ mod day04;
 mod day05;
 mod day06;
 mod day07;
+mod day08;
 
 use crate::advent::{Advent, Solver};
 use advent::Day;
@@ -45,7 +46,8 @@ fn run_all(check: bool) {
 }
 
 fn run_one(day: Day, check: bool) {
-    let solver = days()[day.number - 1];
+    let days = days();
+    let solver = days.get(day.number - 1).expect("Day not found");
     let time = std::time::Instant::now();
     let (part_1, part_2) = if check {
         solver.run_and_check(day)
@@ -68,5 +70,6 @@ fn days() -> Vec<&'static dyn Solver> {
         &day05::Day05,
         &day06::Day06,
         &day07::Day07,
+        &day08::Day08,
     ]
 }
