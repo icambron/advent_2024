@@ -7,22 +7,66 @@ mod day05;
 mod day06;
 mod day07;
 
-use advent::Advent;
+use crate::advent::{Advent, Solver};
+use advent::Day;
+use std::collections::BTreeMap;
 
 fn main() {
-    let advent = Advent::parse_args();
-    let time = std::time::Instant::now();
-    let f = match advent.day {
-        1 => day01::run,
-        2 => day02::run,
-        3 => day03::run,
-        4 => day04::run,
-        5 => day05::run,
-        6 => day06::run,
-        7 => day07::run,
-        _ => panic!("Day {} not implemented", advent.day),
-    };
+    match Advent::parse_args() {
+        Advent::Day(day, check) => run_one(day, check),
+        Advent::All(check) => run_all(check),
+    }
+}
 
-    f(advent);
-    println!("Time: {:?}", time.elapsed());
+fn run_all(check: bool) {
+    let mut times: BTreeMap<usize, std::time::Duration> = BTreeMap::new();
+    for (i, solver) in days().iter().enumerate() {
+        let number = i + 1;
+
+        let day = Day {
+            number,
+            input: advent::Input::Real,
+        };
+
+        let time = std::time::Instant::now();
+
+        if check {
+            solver.run_and_check(day);
+        } else {
+            solver.run(day);
+        }
+        times.insert(number, time.elapsed());
+    }
+
+    println!("{0: <4}| {1: <10}", "Day", "Time");
+    for (day, time) in times {
+        println!(" {0:02} | {1: <10?}", day, time);
+    }
+}
+
+fn run_one(day: Day, check: bool) {
+    let solver = days()[day.number - 1];
+    let time = std::time::Instant::now();
+    let (part_1, part_2) = if check {
+        solver.run_and_check(day)
+    } else {
+        solver.run(day)
+    };
+    let elapsed = time.elapsed();
+
+    println!("Part 1: {}", part_1);
+    println!("Part 2: {}", part_2);
+    println!("Time: {:?}", elapsed);
+}
+
+fn days() -> Vec<&'static dyn Solver> {
+    vec![
+        &day01::Day01,
+        &day02::Day02,
+        &day03::Day03,
+        &day04::Day04,
+        &day05::Day05,
+        &day06::Day06,
+        &day07::Day07,
+    ]
 }

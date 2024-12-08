@@ -1,24 +1,29 @@
-use crate::advent::Advent;
+use crate::advent::{Day, Solver};
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-pub fn run(advent: Advent) {
-    let (list_a, list_b) = parse_file(&advent.path());
-    part_1(&list_a, &list_b);
-    part_2(&list_a, &list_b);
+pub struct Day01;
+
+impl Solver for Day01 {
+    fn run(&self, day: Day) -> (u64, u64) {
+        let (list_a, list_b) = parse_file(&day.path());
+        (part_1(&list_a, &list_b), part_2(&list_a, &list_b))
+    }
+
+    fn expected(&self) -> (u64, u64) {
+        (2756096, 23117829)
+    }
 }
 
-fn part_1(list_a: &[i32], list_b: &[i32]) {
-    let sum = list_a
+fn part_1(list_a: &[i32], list_b: &[i32]) -> u64 {
+    list_a
         .iter()
         .zip(list_b.iter())
-        .fold(0, |sum, (a, b)| sum + (b - a).abs());
-
-    println!("Part 1: {}", sum);
+        .fold(0, |sum, (a, b)| sum + (b - a).abs() as u64)
 }
 
-fn part_2(list_a: &[i32], list_b: &[i32]) {
+fn part_2(list_a: &[i32], list_b: &[i32]) -> u64 {
     let mut hash = BTreeMap::new();
     for n in list_b.iter() {
         hash.entry(n).and_modify(|e| *e += 1).or_insert(1);
@@ -29,7 +34,7 @@ fn part_2(list_a: &[i32], list_b: &[i32]) {
         sum + similarity * val
     });
 
-    println!("Part 2: {}", sum_similarity);
+    sum_similarity as u64
 }
 
 fn parse_file(file: &str) -> (Vec<i32>, Vec<i32>) {

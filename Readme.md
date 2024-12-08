@@ -16,4 +16,7 @@ cargo run -- -d <day>
 
 # Run the given day with sample input
 cargo run -- -d <day> -s
+
+# Run all days
+cargo run -- -a
 ```

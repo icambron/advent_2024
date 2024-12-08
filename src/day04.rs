@@ -1,15 +1,21 @@
-use crate::advent::Advent;
+use crate::advent::{Day, Solver};
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 
-pub fn run(advent: Advent) {
-    let parsed = parse_file(&advent.path());
-    part_1(&parsed);
-    part_2(&parsed);
+pub struct Day04;
+impl Solver for Day04 {
+    fn run(&self, day: Day) -> (u64, u64) {
+        let parsed = parse_file(&day.path());
+        (part_1(&parsed), part_2(&parsed))
+    }
+
+    fn expected(&self) -> (u64, u64) {
+        (2599, 1948)
+    }
 }
 
-fn part_1(parsed: &[Vec<char>]) {
+fn part_1(parsed: &[Vec<char>]) -> u64 {
     let xs: Vec<Pos> = find_all(parsed, 'X');
     const MAS: &str = "MAS";
 
@@ -46,10 +52,10 @@ fn part_1(parsed: &[Vec<char>]) {
         }
     }
 
-    println!("Part 1: {}", xmases);
+    xmases as u64
 }
 
-fn part_2(parsed: &[Vec<char>]) {
+fn part_2(parsed: &[Vec<char>]) -> u64 {
     fn is_mas(parsed: &[Vec<char>], tuple: (Option<Pos>, Option<Pos>)) -> bool {
         if let (Some(first), Some(second)) = tuple {
             if let (Some(c1), Some(c2)) = (first.char_at(parsed), second.char_at(parsed)) {
@@ -74,7 +80,7 @@ fn part_2(parsed: &[Vec<char>]) {
         })
         .count();
 
-    println!("Part 2: {}", xmases);
+    xmases as u64
 }
 
 fn find_all(parsed: &[Vec<char>], target: char) -> Vec<Pos> {

@@ -1,28 +1,32 @@
-use crate::advent::Advent;
+use crate::advent::{Day, Solver};
 use std::collections::{BTreeMap, HashSet};
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 
-pub fn run(advent: Advent) {
-    let parsed = parse_file(&advent.path());
-    part_1(&parsed);
-    part_2(parsed);
+pub struct Day05;
+impl Solver for Day05 {
+    fn run(&self, day: Day) -> (u64, u64) {
+        let parsed = parse_file(&day.path());
+        (part_1(&parsed), part_2(parsed))
+    }
+
+    fn expected(&self) -> (u64, u64) {
+        (5948, 3062)
+    }
 }
 
-fn part_1(parsed: &Update) {
-    let result = parsed
+fn part_1(parsed: &Update) -> u64 {
+    parsed
         .pages
         .iter()
         .filter(|page_set| is_correct(page_set, &parsed.rules))
         .map(|page_set| middle_page(page_set))
-        .sum::<usize>();
-
-    println!("Part 1: {}", result);
+        .sum::<usize>() as u64
 }
 
-fn part_2(parsed: Update) {
-    let sum = parsed
+fn part_2(parsed: Update) -> u64 {
+    parsed
         .pages
         .into_iter()
         .filter(|page_set| !is_correct(page_set, &parsed.rules))
@@ -39,9 +43,7 @@ fn part_2(parsed: Update) {
 
             middle_page(&page_set)
         })
-        .sum::<usize>();
-
-    println!("Part 2: {}", sum);
+        .sum::<usize>() as u64
 }
 
 fn is_correct(page_set: &[usize], rules: &HashSet<(usize, usize)>) -> bool {

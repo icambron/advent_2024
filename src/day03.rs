@@ -1,25 +1,24 @@
-use crate::advent::Advent;
+use crate::advent::{Day, Solver};
 use regex::Regex;
 use std::fs::File;
 use std::io::read_to_string;
 
-pub fn run(advent: Advent) {
-    let file = parse_file(&advent.path());
-    part_1(&file);
-    part_2(&file);
+pub struct Day03;
+
+impl Solver for Day03 {
+    fn run(&self, day: Day) -> (u64, u64) {
+        let file = parse_file(&day.path());
+        let part_1 = sum_all(&file, false);
+        let part_2 = sum_all(&file, true);
+        (part_1, part_2)
+    }
+
+    fn expected(&self) -> (u64, u64) {
+        (189600467, 107069718)
+    }
 }
 
-fn part_1(ops: &[Op]) {
-    let sum = sum_all(ops, false);
-    println!("Part 1: {}", sum);
-}
-
-fn part_2(ops: &[Op]) {
-    let sum = sum_all(ops, true);
-    println!("Part 2: {}", sum);
-}
-
-fn sum_all(ops: &[Op], allow_disable: bool) -> i64 {
+fn sum_all(ops: &[Op], allow_disable: bool) -> u64 {
     let mut sum = 0;
     let mut doing = true;
     for op in ops {
@@ -33,7 +32,7 @@ fn sum_all(ops: &[Op], allow_disable: bool) -> i64 {
             Op::Dont => doing = false,
         }
     }
-    sum
+    sum as u64
 }
 
 fn parse_file(file: &str) -> Vec<Op> {

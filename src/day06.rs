@@ -1,29 +1,39 @@
+use crate::advent::{Day, Solver};
 use std::collections::HashSet;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
-use crate::advent::Advent;
 
-pub fn run(advent: Advent) {
-    let (grid, guard) = parse_input(&advent.path());
-    let candidate_pos = part_1(&grid, guard.clone());
-    part_2(&grid, guard, candidate_pos);
+pub struct Day06;
+impl Solver for Day06 {
+    fn run(&self, day: Day) -> (u64, u64) {
+        let (grid, guard) = parse_input(&day.path());
+        let candidate_pos = part_1(&grid, guard.clone());
+
+        (
+            candidate_pos.len() as u64,
+            part_2(&grid, guard, candidate_pos),
+        )
+    }
+
+    fn expected(&self) -> (u64, u64) {
+        (4696, 1443)
+    }
 }
 
 fn part_1(grid: &Grid, mut guard: Guard) -> HashSet<Pos> {
     let mut visited = HashSet::new();
 
+    visited.insert(guard.pos.clone());
+
     while guard.step(grid, &None) {
         visited.insert(guard.pos.clone());
     }
 
-    println!("Part 1: {}", visited.len());
-
     visited
 }
 
-fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) {
-
+fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) -> u64 {
     let mut obstacles_that_worked = 0;
 
     let mut i = 1;
@@ -33,7 +43,6 @@ fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) {
     let mut visited = vec![(0, Dir::Up); grid.width * grid.height];
 
     for pos in candidate_pos {
-
         // can't put a new obstacle in the same place as the guard
         if pos == guard.pos {
             continue;
@@ -43,7 +52,9 @@ fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) {
         let pos = Some(pos);
 
         while new_guard.step(grid, &pos) {
-            let (j, dir) = visited.get_mut(new_guard.pos.y * grid.width + new_guard.pos.x).unwrap();
+            let (j, dir) = visited
+                .get_mut(new_guard.pos.y * grid.width + new_guard.pos.x)
+                .unwrap();
             if *j == i && *dir == new_guard.dir {
                 obstacles_that_worked += 1;
                 break;
@@ -56,7 +67,7 @@ fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) {
         i += 1;
     }
 
-    println!("Part 2: {}", obstacles_that_worked);
+    obstacles_that_worked
 }
 
 fn parse_input(file: &str) -> (Grid, Guard) {
@@ -66,7 +77,10 @@ fn parse_input(file: &str) -> (Grid, Guard) {
     let mut guard = None;
     let mut height = 0;
     let mut width = 0;
-    for (y, line) in lines.enumerate().map_while(|(y, l)| l.ok().map(|line| (y, line))) {
+    for (y, line) in lines
+        .enumerate()
+        .map_while(|(y, l)| l.ok().map(|line| (y, line)))
+    {
         height += 1;
         if width == 0 {
             width = line.len();
@@ -74,26 +88,22 @@ fn parse_input(file: &str) -> (Grid, Guard) {
 
         for (x, c) in line.chars().enumerate() {
             let square = match c {
-                '#' => { Square::Obstacle },
-                '.' => { Square::Empty },
-                _  => {
+                '#' => Square::Obstacle,
+                '.' => Square::Empty,
+                _ => {
                     guard = Some(Guard {
                         dir: Dir::from_str(c),
                         pos: Pos { x, y },
                     });
                     Square::Empty
-                },
+                }
             };
             map.push(square);
         }
     }
 
     if let Some(g) = guard {
-        (Grid {
-            width,
-            height,
-            map
-        }, g)
+        (Grid { width, height, map }, g)
     } else {
         panic!("No guard found");
     }
@@ -120,7 +130,10 @@ impl Grid {
             return None;
         }
 
-        Some(Pos { x: x as usize, y: y as usize })
+        Some(Pos {
+            x: x as usize,
+            y: y as usize,
+        })
     }
 }
 
@@ -133,7 +146,7 @@ struct Pos {
 #[derive(Debug, Clone, Copy)]
 enum Square {
     Obstacle,
-    Empty
+    Empty,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -141,7 +154,7 @@ enum Dir {
     Up,
     Down,
     Left,
-    Right
+    Right,
 }
 
 impl Dir {
@@ -160,7 +173,7 @@ impl Dir {
             'v' => Dir::Down,
             '<' => Dir::Left,
             '>' => Dir::Right,
-            _ => panic!("Invalid character")
+            _ => panic!("Invalid character"),
         }
     }
 
@@ -187,7 +200,7 @@ impl Guard {
             if let Some(obstacle) = obstacle {
                 if new_pos == *obstacle {
                     self.dir = self.dir.rotate_right();
-                    return self.step(grid, &Some(obstacle.clone()))
+                    return self.step(grid, &Some(obstacle.clone()));
                 }
             }
 
@@ -198,7 +211,7 @@ impl Guard {
                 Some(Square::Empty) => {
                     self.pos = new_pos;
                     true
-                },
+                }
                 Some(Square::Obstacle) => {
                     self.dir = self.dir.rotate_right();
                     self.step(grid, obstacle)

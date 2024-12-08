@@ -1,25 +1,30 @@
-use crate::advent::Advent;
+use crate::advent::{Day, Solver};
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 
-pub fn run(advent: Advent) {
-    let parsed = parse_file(&advent.path());
-    part_1(&parsed);
-    part_2(&parsed);
+pub struct Day02;
+
+impl Solver for Day02 {
+    fn run(&self, day: Day) -> (u64, u64) {
+        let parsed = parse_file(&day.path());
+        (part_1(&parsed), part_2(&parsed))
+    }
+
+    fn expected(&self) -> (u64, u64) {
+        (332, 398)
+    }
 }
 
-fn part_1(parsed: &[Vec<i8>]) {
-    let count_safe = parsed
+fn part_1(parsed: &[Vec<i8>]) -> u64 {
+    parsed
         .iter()
         .filter(|report| is_report_safe(report, None))
-        .count();
-
-    println!("Part 1: {}", count_safe);
+        .count() as u64
 }
 
-fn part_2(parsed: &[Vec<i8>]) {
-    let count_safe = parsed
+fn part_2(parsed: &[Vec<i8>]) -> u64 {
+    parsed
         .iter()
         .filter(|report| {
             report
@@ -27,9 +32,7 @@ fn part_2(parsed: &[Vec<i8>]) {
                 .enumerate()
                 .any(|(i, _)| is_report_safe(report, Some(i)))
         })
-        .count();
-
-    println!("Part 2: {}", count_safe);
+        .count() as u64
 }
 
 fn is_report_safe(report: &[i8], exclude_index: Option<usize>) -> bool {
