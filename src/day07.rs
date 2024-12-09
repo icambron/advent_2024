@@ -39,6 +39,10 @@ fn try_combos(equations: &[Equation], ops: &[Op]) -> u64 {
 
         let arg_length = eq.args.len();
 
+        // it would probably be faster to iterate backwards:
+        // * could check divisibility for the mult ones
+        // * could check prefix for the concat ones
+        // but that sounds complicated and this one is 30ms on my machine, which is...fine
         while let Some(entry) = stack.pop() {
             if let Some(arg) = eq.args.get(entry.depth) {
                 let partial_sum = match entry.op {
@@ -52,7 +56,10 @@ fn try_combos(equations: &[Equation], ops: &[Op]) -> u64 {
                 if depth == arg_length && partial_sum == eq.result {
                     sum_ok += eq.result;
                     break;
-                } else if depth < arg_length {
+                }  else if partial_sum > eq.result {
+                    continue;
+                }
+                else if depth < arg_length {
                     for op in ops {
                         stack.push(Entry {
                             op,
