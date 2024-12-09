@@ -10,6 +10,8 @@ Just having fun. Not competitive on any metric. Aiming for:
 
 # Running
 
+You'll need _all_ the input files or it won't even compile. Get your own from the AoC site.
+
 ```
 # Run the given day
 cargo run -- -d <day>
@@ -20,3 +22,5 @@ cargo run -- -d <day> -s
 # Run all days
 cargo run -- -a
 ```
+
+There's a `-c` arg that checks the outputs, but it'll only work with my inputs.
