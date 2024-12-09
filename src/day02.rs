@@ -1,5 +1,4 @@
 use crate::advent::Solver;
-use crate::{input, sample};
 
 pub struct Day02;
 
@@ -11,14 +10,6 @@ impl Solver for Day02 {
 
     fn expected(&self) -> (u64, u64) {
         (332, 398)
-    }
-
-    fn input(&self) -> &'static str {
-        input!(02)
-    }
-
-    fn sample(&self) -> &'static str {
-        sample!(02)
     }
 }
 

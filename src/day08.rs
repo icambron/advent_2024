@@ -1,5 +1,4 @@
 use crate::advent::Solver;
-use crate::{input, sample};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -13,14 +12,6 @@ impl Solver for Day08 {
 
     fn expected(&self) -> (u64, u64) {
         (261, 898)
-    }
-
-    fn input(&self) -> &'static str {
-        input!(08)
-    }
-
-    fn sample(&self) -> &'static str {
-        sample!(08)
     }
 }
 

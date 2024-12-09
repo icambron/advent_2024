@@ -1,3 +1,5 @@
+use std::fs;
+
 pub enum Advent {
     Day(Day, bool),
     All(bool),
@@ -62,16 +64,9 @@ pub trait Solver {
     
     fn expected(&self) -> (u64, u64);
     
-    fn input(&self) -> &'static str;
-    
-    fn sample(&self) -> &'static str;
-    
     fn solve(&self, day: Day, check: bool) -> (u64, u64) {
-        let input = match day.input {
-            Input::Sample => self.sample(),
-            Input::Real => self.input(),
-        };
-        let (part_1, part_2) = self.run(input);
+        let input = load_file(&day.path());
+        let (part_1, part_2) = self.run(&input);
         
         if check {
             let (expected_1, expected_2) = self.expected();
@@ -83,16 +78,6 @@ pub trait Solver {
     }
 }
 
-#[macro_export]
-macro_rules! input {
-    ($day:expr) => {
-        include_str!(concat!("../files/inputs/", stringify!($day), ".txt"))
-    };
-}
-
-#[macro_export]
-macro_rules! sample {
-    ($day:expr) => {
-        include_str!(concat!("../files/samples/", stringify!($day), ".txt"))
-    };
+pub fn load_file(path: &str) -> String {
+    fs::read_to_string(path).expect("Failed to read file")
 }

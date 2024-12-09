@@ -1,5 +1,4 @@
 use crate::advent::Solver;
-use crate::{input, sample};
 use std::collections::{BTreeMap, HashSet};
 
 pub struct Day05;
@@ -11,14 +10,6 @@ impl Solver for Day05 {
 
     fn expected(&self) -> (u64, u64) {
         (5948, 3062)
-    }
-
-    fn input(&self) -> &'static str {
-        input!(05)
-    }
-
-    fn sample(&self) -> &'static str {
-        sample!(05)
     }
 }
 

@@ -14,14 +14,6 @@ impl Solver for Day03 {
     fn expected(&self) -> (u64, u64) {
         (189600467, 107069718)
     }
-
-    fn input(&self) -> &'static str {
-        include_str!("../files/inputs/03.txt")
-    }
-
-    fn sample(&self) -> &'static str {
-        include_str!("../files/samples/03.txt")
-    }
 }
 
 fn sum_all(ops: &[Op], allow_disable: bool) -> u64 {

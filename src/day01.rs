@@ -1,5 +1,4 @@
 use crate::advent::Solver;
-use crate::{input, sample};
 use std::collections::BTreeMap;
 
 pub struct Day01;
@@ -14,13 +13,6 @@ impl Solver for Day01 {
         (2756096, 23117829)
     }
 
-    fn input(&self) -> &'static str {
-        input!(01)
-    }
-
-    fn sample(&self) -> &'static str {
-        sample!(01)
-    }
 }
 
 fn part_1(list_a: &[i32], list_b: &[i32]) -> u64 {

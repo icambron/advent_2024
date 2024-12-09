@@ -1,5 +1,4 @@
 use crate::advent::Solver;
-use crate::{input, sample};
 use std::collections::HashSet;
 
 pub struct Day06;
@@ -16,14 +15,6 @@ impl Solver for Day06 {
 
     fn expected(&self) -> (u64, u64) {
         (4696, 1443)
-    }
-
-    fn input(&self) -> &'static str {
-        input!(06)
-    }
-
-    fn sample(&self) -> &'static str {
-        sample!(06)
     }
 }
 

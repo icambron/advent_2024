@@ -10,8 +10,6 @@ Just having fun. Not competitive on any metric. Aiming for:
 
 # Running
 
-You'll need _all_ the input files or it won't even compile. Get your own from the AoC site.
-
 ```
 # Run the given day
 cargo run -- -d <day>
