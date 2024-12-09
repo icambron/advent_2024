@@ -58,14 +58,41 @@ impl Input {
 }
 
 pub trait Solver {
-    fn run(&self, day: Day) -> (u64, u64);
+    fn run(&self, input: &str) -> (u64, u64);
+    
     fn expected(&self) -> (u64, u64);
-
-    fn run_and_check(&self, day: Day) -> (u64, u64) {
-        let (part_1, part_2) = self.run(day);
-        let (expected_1, expected_2) = self.expected();
-        assert_eq!(part_1, expected_1);
-        assert_eq!(part_2, expected_2);
+    
+    fn input(&self) -> &'static str;
+    
+    fn sample(&self) -> &'static str;
+    
+    fn solve(&self, day: Day, check: bool) -> (u64, u64) {
+        let input = match day.input {
+            Input::Sample => self.sample(),
+            Input::Real => self.input(),
+        };
+        let (part_1, part_2) = self.run(input);
+        
+        if check {
+            let (expected_1, expected_2) = self.expected();
+            assert_eq!(part_1, expected_1);
+            assert_eq!(part_2, expected_2);
+        }
+        
         (part_1, part_2)
     }
+}
+
+#[macro_export]
+macro_rules! input {
+    ($day:expr) => {
+        include_str!(concat!("../files/inputs/", stringify!($day), ".txt"))
+    };
+}
+
+#[macro_export]
+macro_rules! sample {
+    ($day:expr) => {
+        include_str!(concat!("../files/samples/", stringify!($day), ".txt"))
+    };
 }

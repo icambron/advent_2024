@@ -1,10 +1,10 @@
-use crate::advent::{Day, Solver};
-use std::io::BufRead;
+use crate::advent::Solver;
+use crate::{input, sample};
 
 pub struct Day07;
 impl Solver for Day07 {
-    fn run(&self, day: Day) -> (u64, u64) {
-        let equations = parse_file(&day.path());
+    fn run(&self, input: &str) -> (u64, u64) {
+        let equations = parse(input);
         let part_1 = try_combos(&equations, &[Op::Add, Op::Mul]);
         let part_2 = try_combos(&equations, &[Op::Add, Op::Mul, Op::Concat]);
         (part_1, part_2)
@@ -12,6 +12,14 @@ impl Solver for Day07 {
 
     fn expected(&self) -> (u64, u64) {
         (21572148763543, 581941094529163)
+    }
+
+    fn input(&self) -> &'static str {
+        input!(07)
+    }
+
+    fn sample(&self) -> &'static str {
+        sample!(07)
     }
 }
 
@@ -73,12 +81,9 @@ fn concat_numbers(a: u64, b: u64) -> u64 {
     a * multiplier + b
 }
 
-fn parse_file(path: &str) -> Vec<Equation> {
-    let file = std::fs::File::open(path).expect("Should be able to open file");
-    let reader = std::io::BufReader::new(file);
-    reader
+fn parse(input: &str) -> Vec<Equation> {
+    input
         .lines()
-        .map_while(|l| l.ok())
         .map(|line| {
             let colon_split = line.split(": ").collect::<Vec<&str>>();
             let result = colon_split[0].parse::<u64>().unwrap();

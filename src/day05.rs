@@ -1,18 +1,24 @@
-use crate::advent::{Day, Solver};
+use crate::advent::Solver;
+use crate::{input, sample};
 use std::collections::{BTreeMap, HashSet};
-use std::fs::File;
-use std::io;
-use std::io::BufRead;
 
 pub struct Day05;
 impl Solver for Day05 {
-    fn run(&self, day: Day) -> (u64, u64) {
-        let parsed = parse_file(&day.path());
+    fn run(&self, input: &str) -> (u64, u64) {
+        let parsed = parse(input);
         (part_1(&parsed), part_2(parsed))
     }
 
     fn expected(&self) -> (u64, u64) {
         (5948, 3062)
+    }
+
+    fn input(&self) -> &'static str {
+        input!(05)
+    }
+
+    fn sample(&self) -> &'static str {
+        sample!(05)
     }
 }
 
@@ -68,13 +74,10 @@ fn middle_page(page_set: &[usize]) -> usize {
     page_set[(page_set.len() - 1) / 2]
 }
 
-fn parse_file(file: &str) -> Update {
-    let file = File::open(file).expect("Should be able to open file");
-
-    let lines = io::BufReader::new(file).lines();
+fn parse(input: &str) -> Update {
     let mut rules = HashSet::new();
     let mut pages = Vec::new();
-    for line in lines.map_while(|l| l.ok()) {
+    for line in input.lines() {
         if line.contains(",") {
             let parts = line.split(",");
             let lil_pages: Vec<usize> = parts.map(|p| p.parse().unwrap()).collect();

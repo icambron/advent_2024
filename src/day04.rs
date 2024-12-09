@@ -1,17 +1,23 @@
-use crate::advent::{Day, Solver};
-use std::fs::File;
-use std::io;
-use std::io::BufRead;
+use crate::advent::Solver;
+use crate::{input, sample};
 
 pub struct Day04;
 impl Solver for Day04 {
-    fn run(&self, day: Day) -> (u64, u64) {
-        let parsed = parse_file(&day.path());
+    fn run(&self, input: &str) -> (u64, u64) {
+        let parsed = parse(input);
         (part_1(&parsed), part_2(&parsed))
     }
 
     fn expected(&self) -> (u64, u64) {
         (2599, 1948)
+    }
+
+    fn input(&self) -> &'static str {
+        input!(04)
+    }
+
+    fn sample(&self) -> &'static str {
+        sample!(04)
     }
 }
 
@@ -99,11 +105,9 @@ fn find_all(parsed: &[Vec<char>], target: char) -> Vec<Pos> {
         .collect()
 }
 
-fn parse_file(file: &str) -> Vec<Vec<char>> {
-    let file = File::open(file).expect("Should be able to open file");
-    let lines = io::BufReader::new(file).lines();
+fn parse(input: &str) -> Vec<Vec<char>> {
     let mut parsed = Vec::new();
-    for line in lines.map_while(|l| l.ok()) {
+    for line in input.lines() {
         let row: Vec<char> = line.chars().collect();
         parsed.push(row);
     }

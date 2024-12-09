@@ -13,10 +13,10 @@ use advent::Day;
 use std::collections::BTreeMap;
 
 fn main() {
-    match Advent::parse_args() {
-        Advent::Day(day, check) => run_one(day, check),
-        Advent::All(check) => run_all(check),
-    }
+     match Advent::parse_args() {
+         Advent::Day(day, check) => run_one(day, check),
+         Advent::All(check) => run_all(check),
+     }
 }
 
 fn run_all(check: bool) {
@@ -31,29 +31,25 @@ fn run_all(check: bool) {
 
         let time = std::time::Instant::now();
 
-        if check {
-            solver.run_and_check(day);
-        } else {
-            solver.run(day);
-        }
+        solver.solve(day, check);
         times.insert(number, time.elapsed());
     }
+
+    let total: std::time::Duration = times.values().sum();
 
     println!("{0: <4}| {1: <10}", "Day", "Time");
     for (day, time) in times {
         println!(" {0:02} | {1: <10?}", day, time);
     }
+    
+    println!("Total: {:?}", total);
 }
 
 fn run_one(day: Day, check: bool) {
     let days = days();
     let solver = days.get(day.number - 1).expect("Day not found");
     let time = std::time::Instant::now();
-    let (part_1, part_2) = if check {
-        solver.run_and_check(day)
-    } else {
-        solver.run(day)
-    };
+    let (part_1, part_2) = solver.solve(day, check);
     let elapsed = time.elapsed();
 
     println!("Part 1: {}", part_1);

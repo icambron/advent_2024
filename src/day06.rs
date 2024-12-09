@@ -1,13 +1,11 @@
-use crate::advent::{Day, Solver};
+use crate::advent::Solver;
+use crate::{input, sample};
 use std::collections::HashSet;
-use std::fs::File;
-use std::io;
-use std::io::BufRead;
 
 pub struct Day06;
 impl Solver for Day06 {
-    fn run(&self, day: Day) -> (u64, u64) {
-        let (grid, guard) = parse_input(&day.path());
+    fn run(&self, input: &str) -> (u64, u64) {
+        let (grid, guard) = parse(input);
         let candidate_pos = part_1(&grid, guard.clone());
 
         (
@@ -18,6 +16,14 @@ impl Solver for Day06 {
 
     fn expected(&self) -> (u64, u64) {
         (4696, 1443)
+    }
+
+    fn input(&self) -> &'static str {
+        input!(06)
+    }
+
+    fn sample(&self) -> &'static str {
+        sample!(06)
     }
 }
 
@@ -70,17 +76,12 @@ fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) -> u64 {
     obstacles_that_worked
 }
 
-fn parse_input(file: &str) -> (Grid, Guard) {
-    let file = File::open(file).expect("Should be able to open file");
-    let lines = io::BufReader::new(file).lines();
+fn parse(input: &str) -> (Grid, Guard) {
     let mut map = Vec::new();
     let mut guard = None;
     let mut height = 0;
     let mut width = 0;
-    for (y, line) in lines
-        .enumerate()
-        .map_while(|(y, l)| l.ok().map(|line| (y, line)))
-    {
+    for (y, line) in input.lines().enumerate() {
         height += 1;
         if width == 0 {
             width = line.len();

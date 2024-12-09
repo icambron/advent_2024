@@ -1,18 +1,25 @@
-use crate::advent::{Day, Solver};
+use crate::advent::Solver;
+use crate::{input, sample};
 use std::collections::BTreeMap;
-use std::fs::File;
-use std::io::{self, BufRead};
 
 pub struct Day01;
 
 impl Solver for Day01 {
-    fn run(&self, day: Day) -> (u64, u64) {
-        let (list_a, list_b) = parse_file(&day.path());
+    fn run(&self, input: &str) -> (u64, u64) {
+        let (list_a, list_b) = parse(input);
         (part_1(&list_a, &list_b), part_2(&list_a, &list_b))
     }
 
     fn expected(&self) -> (u64, u64) {
         (2756096, 23117829)
+    }
+
+    fn input(&self) -> &'static str {
+        input!(01)
+    }
+
+    fn sample(&self) -> &'static str {
+        sample!(01)
     }
 }
 
@@ -20,7 +27,7 @@ fn part_1(list_a: &[i32], list_b: &[i32]) -> u64 {
     list_a
         .iter()
         .zip(list_b.iter())
-        .fold(0, |sum, (a, b)| sum + (b - a).abs() as u64)
+        .fold(0, |sum, (a, b)| sum + (b - a).unsigned_abs()) as u64
 }
 
 fn part_2(list_a: &[i32], list_b: &[i32]) -> u64 {
@@ -37,13 +44,12 @@ fn part_2(list_a: &[i32], list_b: &[i32]) -> u64 {
     sum_similarity as u64
 }
 
-fn parse_file(file: &str) -> (Vec<i32>, Vec<i32>) {
-    let file = File::open(file).expect("Should be able to open file");
-    let lines = io::BufReader::new(file).lines();
+fn parse(input: &str) -> (Vec<i32>, Vec<i32>) {
+    
     let mut list_a = Vec::with_capacity(1000);
     let mut list_b = Vec::with_capacity(1000);
 
-    for line in lines.map_while(|l| l.ok()) {
+    for line in input.lines() {
         let numbers: Vec<i32> = line
             .split_whitespace()
             .map(|s| s.parse::<i32>().expect("Text should be a number"))

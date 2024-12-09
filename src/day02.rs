@@ -1,18 +1,24 @@
-use crate::advent::{Day, Solver};
-use std::fs::File;
-use std::io;
-use std::io::BufRead;
+use crate::advent::Solver;
+use crate::{input, sample};
 
 pub struct Day02;
 
 impl Solver for Day02 {
-    fn run(&self, day: Day) -> (u64, u64) {
-        let parsed = parse_file(&day.path());
+    fn run(&self, input: &str) -> (u64, u64) {
+        let parsed = parse(input);
         (part_1(&parsed), part_2(&parsed))
     }
 
     fn expected(&self) -> (u64, u64) {
         (332, 398)
+    }
+
+    fn input(&self) -> &'static str {
+        input!(02)
+    }
+
+    fn sample(&self) -> &'static str {
+        sample!(02)
     }
 }
 
@@ -81,18 +87,9 @@ fn ok_lower(prev: i8, level: i8) -> bool {
     level < prev && level >= prev - 3
 }
 
-enum ReportState {
-    Start,
-    First(i8),
-    Up(i8),
-    Down(i8),
-}
-
-fn parse_file(file: &str) -> Vec<Vec<i8>> {
-    let file = File::open(file).expect("Should be able to open file");
-    let lines = io::BufReader::new(file).lines();
+fn parse(input: &str) -> Vec<Vec<i8>> {
     let mut reports = Vec::with_capacity(1000);
-    for line in lines.map_while(|l| l.ok()) {
+    for line in input.lines() {
         let levels: Vec<i8> = line
             .split_whitespace()
             .map(|s| s.parse::<i8>().expect("Text should be a number"))
@@ -101,3 +98,12 @@ fn parse_file(file: &str) -> Vec<Vec<i8>> {
     }
     reports
 }
+
+
+enum ReportState {
+    Start,
+    First(i8),
+    Up(i8),
+    Down(i8),
+}
+

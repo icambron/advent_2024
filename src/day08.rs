@@ -1,20 +1,26 @@
-use std::collections::HashMap;
-use std::fs::File;
-use std::io;
-use std::io::BufRead;
+use crate::advent::Solver;
+use crate::{input, sample};
 use itertools::Itertools;
-use crate::advent::{Day, Solver};
+use std::collections::HashMap;
 
 pub struct Day08;
 
 impl Solver for Day08 {
-    fn run(&self, day: Day) -> (u64, u64) {
-        let parsed = parse_input(&day.path());
+    fn run(&self, input: &str) -> (u64, u64) {
+        let parsed = parse(input);
         (part_1(&parsed), part_2(&parsed))
     }
 
     fn expected(&self) -> (u64, u64) {
         (261, 898)
+    }
+
+    fn input(&self) -> &'static str {
+        input!(08)
+    }
+
+    fn sample(&self) -> &'static str {
+        sample!(08)
     }
 }
 
@@ -70,15 +76,12 @@ fn part_2(parsed: &Parsed) -> u64 {
     count
 }
 
-fn parse_input(path: &str) -> Parsed {
-    let file = File::open(path).expect("Should be able to open file");
-    let reader = io::BufReader::new(file);
-
+fn parse(input: &str) -> Parsed {
     let mut height = 0;
     let mut width = 0;
     let mut antennas = Vec::new();
 
-    for (y, line) in reader.lines().map_while(|l| l.ok()).enumerate() {
+    for (y, line) in input.lines().enumerate() {
         if y == 0 {
             width = line.len();
         }
