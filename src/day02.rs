@@ -90,11 +90,9 @@ fn parse(input: &str) -> Vec<Vec<i8>> {
     reports
 }
 
-
 enum ReportState {
     Start,
     First(i8),
     Up(i8),
     Down(i8),
 }
-

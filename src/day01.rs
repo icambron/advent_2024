@@ -12,7 +12,6 @@ impl Solver for Day01 {
     fn expected(&self) -> (u64, u64) {
         (2756096, 23117829)
     }
-
 }
 
 fn part_1(list_a: &[i32], list_b: &[i32]) -> u64 {
@@ -37,7 +36,6 @@ fn part_2(list_a: &[i32], list_b: &[i32]) -> u64 {
 }
 
 fn parse(input: &str) -> (Vec<i32>, Vec<i32>) {
-    
     let mut list_a = Vec::with_capacity(1000);
     let mut list_b = Vec::with_capacity(1000);
 

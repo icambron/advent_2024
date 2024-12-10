@@ -25,8 +25,14 @@ fn part_1(parsed: &Parsed) -> u64 {
             let option_2 = Pos::new(2 * b.pos.x - a.pos.x, 2 * b.pos.y - a.pos.y);
 
             for option in &[option_1, option_2] {
-                if option.x >= 0 && option.y >= 0 && option.x < parsed.width as i64 && option.y < parsed.height as i64 {
-                    if let Some(slot) = antinode_map.get_mut(option.y as usize * parsed.width + option.x as usize) {
+                if option.x >= 0
+                    && option.y >= 0
+                    && option.x < parsed.width as i64
+                    && option.y < parsed.height as i64
+                {
+                    if let Some(slot) =
+                        antinode_map.get_mut(option.y as usize * parsed.width + option.x as usize)
+                    {
                         *slot = true;
                     }
                 }
@@ -38,24 +44,28 @@ fn part_1(parsed: &Parsed) -> u64 {
 }
 
 fn part_2(parsed: &Parsed) -> u64 {
-    let formulas: Vec<Resonation> = parsed.antennas.iter().flat_map(|(_, antennas)| {
-        antennas.iter().combinations(2).map(|pair| {
-            let (a, b) = (pair[0], pair[1]);
-            Resonation {
-                delta_x: a.pos.x - b.pos.x,
-                delta_y: a.pos.y - b.pos.y,
-                anchor: a.pos.clone(),
-            }
+    let formulas: Vec<Resonation> = parsed
+        .antennas
+        .iter()
+        .flat_map(|(_, antennas)| {
+            antennas.iter().combinations(2).map(|pair| {
+                let (a, b) = (pair[0], pair[1]);
+                Resonation {
+                    delta_x: a.pos.x - b.pos.x,
+                    delta_y: a.pos.y - b.pos.y,
+                    anchor: a.pos.clone(),
+                }
+            })
         })
-    }).collect();
-    
+        .collect();
+
     let mut count = 0;
     for x in 0..parsed.width as i64 {
         for y in 0..parsed.height as i64 {
             for formula in &formulas {
                 let delta_x = x - formula.anchor.x;
                 let delta_y = y - formula.anchor.y;
-                
+
                 if delta_y * formula.delta_x == delta_x * formula.delta_y {
                     count += 1;
                     break;
@@ -63,7 +73,7 @@ fn part_2(parsed: &Parsed) -> u64 {
             }
         }
     }
-    
+
     count
 }
 
@@ -81,18 +91,23 @@ fn parse(input: &str) -> Parsed {
             if let 'a'..='z' | 'A'..='Z' | '0'..='9' = c {
                 antennas.push(Antenna {
                     freq: c,
-                    pos: Pos::new(x as i64, y as i64)
+                    pos: Pos::new(x as i64, y as i64),
                 });
             }
         }
     }
 
-    let antennas: HashMap<char, Vec<Antenna>> = antennas.iter().fold(HashMap::new(), |mut map, a| {
-        map.entry(a.freq).or_default().push(a.clone());
-        map
-    });
+    let antennas: HashMap<char, Vec<Antenna>> =
+        antennas.iter().fold(HashMap::new(), |mut map, a| {
+            map.entry(a.freq).or_default().push(a.clone());
+            map
+        });
 
-    Parsed { antennas, width, height }
+    Parsed {
+        antennas,
+        width,
+        height,
+    }
 }
 
 #[derive(Debug)]
@@ -105,7 +120,7 @@ struct Parsed {
 #[derive(Debug, Clone)]
 struct Antenna {
     freq: char,
-    pos: Pos
+    pos: Pos,
 }
 
 #[derive(Debug, Clone)]

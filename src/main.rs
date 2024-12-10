@@ -15,10 +15,10 @@ use advent::Day;
 use std::collections::BTreeMap;
 
 fn main() {
-     match Advent::parse_args() {
-         Advent::Day(day, check) => run_one(day, check),
-         Advent::All(check) => run_all(check),
-     }
+    match Advent::parse_args() {
+        Advent::Day(day, check) => run_one(day, check),
+        Advent::All(check) => run_all(check),
+    }
 }
 
 fn run_all(check: bool) {
@@ -43,7 +43,7 @@ fn run_all(check: bool) {
     for (day, time) in times {
         println!(" {0:02} | {1: <10?}", day, time);
     }
-    
+
     println!("Total: {:?}", total);
 }
 

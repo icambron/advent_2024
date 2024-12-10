@@ -16,10 +16,11 @@ impl Solver for Day09 {
 }
 
 fn part_1(slots: &[Slot]) -> u64 {
-    let mut reversed = slots.iter()
+    let mut reversed = slots
+        .iter()
         .rev()
         .enumerate()
-        .filter(|(_, slot)| { matches!(slot, Slot::File(_)) });
+        .filter(|(_, slot)| matches!(slot, Slot::File(_)));
 
     let mut checksum = 0;
     let mut high_j = 0;
@@ -50,30 +51,31 @@ fn part_1(slots: &[Slot]) -> u64 {
 }
 
 fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
-    let mut free: Vec<Block> = blocks.iter()
+    let mut free: Vec<Block> = blocks
+        .iter()
         .filter(|b| matches!(b.slot, Slot::Empty))
         .cloned()
         .collect();
-    
+
     for block in blocks.iter().rev() {
         if let Slot::File(id) = block.slot {
-
-            if let Some((free_index, free_block)) = free.iter_mut()
+            if let Some((free_index, free_block)) = free
+                .iter_mut()
                 .enumerate()
-                .find(|(_, b)| b.size >= block.size) {
-                
+                .find(|(_, b)| b.size >= block.size)
+            {
                 // don't move blocks forward
                 if free_block.start > block.start {
                     continue;
                 }
-                
+
                 let new_slice = &mut slots[free_block.start..free_block.start + block.size];
                 new_slice.fill(Slot::File(id));
-                
+
                 let old_slice = &mut slots[block.start..block.start + block.size];
                 old_slice.fill(Slot::Empty);
-                
-                if free_block.size > block.size  {
+
+                if free_block.size > block.size {
                     free_block.size -= block.size;
                     free_block.start += block.size;
                 } else {
@@ -83,13 +85,17 @@ fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
         }
     }
 
-    slots.iter().enumerate().map(|(i, slot)| {
-        if let Slot::File(id) = slot {
-            (i * *id) as u64
-        } else {
-            0
-        }
-    }).sum()
+    slots
+        .iter()
+        .enumerate()
+        .map(|(i, slot)| {
+            if let Slot::File(id) = slot {
+                (i * *id) as u64
+            } else {
+                0
+            }
+        })
+        .sum()
 }
 
 fn parse(input: &str) -> (Vec<Block>, Vec<Slot>) {
@@ -100,8 +106,11 @@ fn parse(input: &str) -> (Vec<Block>, Vec<Slot>) {
     let mut slots = Vec::new();
 
     while let Some(filled) = chars.next().and_then(|c| c.to_digit(10)) {
-
-        blocks.push(Block { start: index, size: filled as usize, slot: Slot::File(id) });
+        blocks.push(Block {
+            start: index,
+            size: filled as usize,
+            slot: Slot::File(id),
+        });
         for _ in 0..filled {
             slots.push(Slot::File(id));
         }
@@ -109,7 +118,11 @@ fn parse(input: &str) -> (Vec<Block>, Vec<Slot>) {
         index += filled as usize;
 
         if let Some(whitespace) = chars.next().and_then(|c| c.to_digit(10)) {
-            blocks.push(Block { start: index, size: whitespace as usize, slot: Slot::Empty });
+            blocks.push(Block {
+                start: index,
+                size: whitespace as usize,
+                slot: Slot::Empty,
+            });
             for _ in 0..whitespace {
                 slots.push(Slot::Empty);
             }

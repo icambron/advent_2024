@@ -61,19 +61,19 @@ impl Input {
 
 pub trait Solver {
     fn run(&self, input: &str) -> (u64, u64);
-    
+
     fn expected(&self) -> (u64, u64);
-    
+
     fn solve(&self, day: Day, check: bool) -> (u64, u64) {
         let input = load_file(&day.path());
         let (part_1, part_2) = self.run(&input);
-        
+
         if check {
             let (expected_1, expected_2) = self.expected();
             assert_eq!(part_1, expected_1);
             assert_eq!(part_2, expected_2);
         }
-        
+
         (part_1, part_2)
     }
 }

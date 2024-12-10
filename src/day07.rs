@@ -47,10 +47,9 @@ fn try_combos(equations: &[Equation], ops: &[Op]) -> u64 {
                 if depth == arg_length && partial_sum == eq.result {
                     sum_ok += eq.result;
                     break;
-                }  else if partial_sum > eq.result {
+                } else if partial_sum > eq.result {
                     continue;
-                }
-                else if depth < arg_length {
+                } else if depth < arg_length {
                     for op in ops {
                         stack.push(Entry {
                             op,
