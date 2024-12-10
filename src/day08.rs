@@ -25,14 +25,8 @@ fn part_1(parsed: &Parsed) -> u64 {
             let option_2 = Pos::new(2 * b.pos.x - a.pos.x, 2 * b.pos.y - a.pos.y);
 
             for option in &[option_1, option_2] {
-                if option.x >= 0
-                    && option.y >= 0
-                    && option.x < parsed.width as i64
-                    && option.y < parsed.height as i64
-                {
-                    if let Some(slot) =
-                        antinode_map.get_mut(option.y as usize * parsed.width + option.x as usize)
-                    {
+                if option.x >= 0 && option.y >= 0 && option.x < parsed.width as i64 && option.y < parsed.height as i64 {
+                    if let Some(slot) = antinode_map.get_mut(option.y as usize * parsed.width + option.x as usize) {
                         *slot = true;
                     }
                 }
@@ -97,17 +91,12 @@ fn parse(input: &str) -> Parsed {
         }
     }
 
-    let antennas: HashMap<char, Vec<Antenna>> =
-        antennas.iter().fold(HashMap::new(), |mut map, a| {
-            map.entry(a.freq).or_default().push(a.clone());
-            map
-        });
+    let antennas: HashMap<char, Vec<Antenna>> = antennas.iter().fold(HashMap::new(), |mut map, a| {
+        map.entry(a.freq).or_default().push(a.clone());
+        map
+    });
 
-    Parsed {
-        antennas,
-        width,
-        height,
-    }
+    Parsed { antennas, width, height }
 }
 
 #[derive(Debug)]

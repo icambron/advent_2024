@@ -16,11 +16,7 @@ impl Solver for Day09 {
 }
 
 fn part_1(slots: &[Slot]) -> u64 {
-    let mut reversed = slots
-        .iter()
-        .rev()
-        .enumerate()
-        .filter(|(_, slot)| matches!(slot, Slot::File(_)));
+    let mut reversed = slots.iter().rev().enumerate().filter(|(_, slot)| matches!(slot, Slot::File(_)));
 
     let mut checksum = 0;
     let mut high_j = 0;
@@ -51,19 +47,11 @@ fn part_1(slots: &[Slot]) -> u64 {
 }
 
 fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
-    let mut free: Vec<Block> = blocks
-        .iter()
-        .filter(|b| matches!(b.slot, Slot::Empty))
-        .cloned()
-        .collect();
+    let mut free: Vec<Block> = blocks.iter().filter(|b| matches!(b.slot, Slot::Empty)).cloned().collect();
 
     for block in blocks.iter().rev() {
         if let Slot::File(id) = block.slot {
-            if let Some((free_index, free_block)) = free
-                .iter_mut()
-                .enumerate()
-                .find(|(_, b)| b.size >= block.size)
-            {
+            if let Some((free_index, free_block)) = free.iter_mut().enumerate().find(|(_, b)| b.size >= block.size) {
                 // don't move blocks forward
                 if free_block.start > block.start {
                     continue;
@@ -88,13 +76,7 @@ fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
     slots
         .iter()
         .enumerate()
-        .map(|(i, slot)| {
-            if let Slot::File(id) = slot {
-                (i * *id) as u64
-            } else {
-                0
-            }
-        })
+        .map(|(i, slot)| if let Slot::File(id) = slot { (i * *id) as u64 } else { 0 })
         .sum()
 }
 

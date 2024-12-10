@@ -85,13 +85,9 @@ fn find_all(parsed: &[Vec<char>], target: char) -> Vec<Pos> {
         .iter()
         .enumerate()
         .flat_map(|(y, row)| {
-            row.iter().enumerate().filter_map(move |(x, c)| {
-                if *c == target {
-                    Some(Pos { x, y })
-                } else {
-                    None
-                }
-            })
+            row.iter()
+                .enumerate()
+                .filter_map(move |(x, c)| if *c == target { Some(Pos { x, y }) } else { None })
         })
         .collect()
 }

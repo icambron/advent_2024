@@ -7,10 +7,7 @@ impl Solver for Day06 {
         let (grid, guard) = parse(input);
         let candidate_pos = part_1(&grid, guard.clone());
 
-        (
-            candidate_pos.len() as u64,
-            part_2(&grid, guard, candidate_pos),
-        )
+        (candidate_pos.len() as u64, part_2(&grid, guard, candidate_pos))
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -49,9 +46,7 @@ fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) -> u64 {
         let pos = Some(pos);
 
         while new_guard.step(grid, &pos) {
-            let (j, dir) = visited
-                .get_mut(new_guard.pos.y * grid.width + new_guard.pos.x)
-                .unwrap();
+            let (j, dir) = visited.get_mut(new_guard.pos.y * grid.width + new_guard.pos.x).unwrap();
             if *j == i && *dir == new_guard.dir {
                 obstacles_that_worked += 1;
                 break;

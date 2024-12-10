@@ -51,11 +51,7 @@ fn try_combos(equations: &[Equation], ops: &[Op]) -> u64 {
                     continue;
                 } else if depth < arg_length {
                     for op in ops {
-                        stack.push(Entry {
-                            op,
-                            depth,
-                            partial_sum,
-                        });
+                        stack.push(Entry { op, depth, partial_sum });
                     }
                 }
             }
@@ -84,10 +80,7 @@ fn parse(input: &str) -> Vec<Equation> {
         .map(|line| {
             let colon_split = line.split(": ").collect::<Vec<&str>>();
             let result = colon_split[0].parse::<u64>().unwrap();
-            let args = colon_split[1]
-                .split(" ")
-                .map(|arg| arg.parse::<u64>().unwrap())
-                .collect();
+            let args = colon_split[1].split(" ").map(|arg| arg.parse::<u64>().unwrap()).collect();
             Equation { result, args }
         })
         .collect()

@@ -15,10 +15,7 @@ impl Solver for Day01 {
 }
 
 fn part_1(list_a: &[i32], list_b: &[i32]) -> u64 {
-    list_a
-        .iter()
-        .zip(list_b.iter())
-        .fold(0, |sum, (a, b)| sum + (b - a).unsigned_abs()) as u64
+    list_a.iter().zip(list_b.iter()).fold(0, |sum, (a, b)| sum + (b - a).unsigned_abs()) as u64
 }
 
 fn part_2(list_a: &[i32], list_b: &[i32]) -> u64 {

@@ -14,21 +14,13 @@ impl Solver for Day02 {
 }
 
 fn part_1(parsed: &[Vec<i8>]) -> u64 {
-    parsed
-        .iter()
-        .filter(|report| is_report_safe(report, None))
-        .count() as u64
+    parsed.iter().filter(|report| is_report_safe(report, None)).count() as u64
 }
 
 fn part_2(parsed: &[Vec<i8>]) -> u64 {
     parsed
         .iter()
-        .filter(|report| {
-            report
-                .iter()
-                .enumerate()
-                .any(|(i, _)| is_report_safe(report, Some(i)))
-        })
+        .filter(|report| report.iter().enumerate().any(|(i, _)| is_report_safe(report, Some(i))))
         .count() as u64
 }
 

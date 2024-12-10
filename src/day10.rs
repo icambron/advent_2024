@@ -31,11 +31,7 @@ fn compute(map: &Map) -> (u64, u64) {
         for (coord, agg) in progress.into_iter() {
             let up = coord - map.width;
             let down = coord + map.width;
-            let left = if coord % map.width == 0 {
-                usize::MAX
-            } else {
-                coord - 1
-            };
+            let left = if coord % map.width == 0 { usize::MAX } else { coord - 1 };
             let right = if coord % map.width == map.width - 1 {
                 usize::MAX
             } else {
@@ -90,11 +86,7 @@ fn parse(input: &str) -> Map {
         }
     }
 
-    Map {
-        chars: map,
-        width,
-        size,
-    }
+    Map { chars: map, width, size }
 }
 
 type Tracker = BTreeMap<usize, TrailAgg>;
