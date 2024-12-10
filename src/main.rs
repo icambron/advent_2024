@@ -31,10 +31,9 @@ fn run_all(check: bool) {
             input: advent::Input::Real,
         };
 
-        let time = std::time::Instant::now();
 
-        solver.solve(day, check);
-        times.insert(number, time.elapsed());
+        let (_, _, elapsed) = solver.solve(day, check);
+        times.insert(number, elapsed);
     }
 
     let total: std::time::Duration = times.values().sum();
@@ -50,9 +49,8 @@ fn run_all(check: bool) {
 fn run_one(day: Day, check: bool) {
     let days = days();
     let solver = days.get(day.number - 1).expect("Day not found");
-    let time = std::time::Instant::now();
-    let (part_1, part_2) = solver.solve(day, check);
-    let elapsed = time.elapsed();
+
+    let (part_1, part_2, elapsed) = solver.solve(day, check);
 
     println!("Part 1: {}", part_1);
     println!("Part 2: {}", part_2);

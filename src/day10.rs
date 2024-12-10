@@ -15,18 +15,18 @@ impl Solver for Day10 {
 }
 
 fn compute(map: &Map) -> (u64, u64) {
-    let mut progress: Tracker = map
+    let mut progress: BTreeMap<usize, TrailAgg> = map
         .chars
-        .get(&9)
+        .get(&0)
         .unwrap()
         .iter()
         .map(|coord| (*coord, TrailAgg::new(*coord)))
         .collect();
 
-    for i in (0..=8).rev() {
+    for i in 1..=9 {
         let next_set = map.chars.get(&i).unwrap();
 
-        let mut next_progress = Tracker::new();
+        let mut next_progress: BTreeMap<usize, TrailAgg> = BTreeMap::new();
 
         for (coord, agg) in progress.into_iter() {
             let up = coord - map.width;
@@ -58,7 +58,7 @@ fn compute(map: &Map) -> (u64, u64) {
     }
 
     progress.values().fold((0, 0), |(nines, distinct), agg| {
-        (nines + agg.nines.len() as u64, distinct + agg.distinct)
+        (nines + agg.zeros.len() as u64, distinct + agg.perm)
     })
 }
 
@@ -89,7 +89,7 @@ fn parse(input: &str) -> Map {
     Map { chars: map, width, size }
 }
 
-type Tracker = BTreeMap<usize, TrailAgg>;
+
 type CharMap = BTreeMap<usize, BTreeSet<usize>>;
 
 #[derive(Debug)]
@@ -101,20 +101,20 @@ struct Map {
 
 #[derive(Debug, Clone)]
 struct TrailAgg {
-    nines: BTreeSet<usize>,
-    distinct: u64,
+    perm: u64,
+    zeros: BTreeSet<usize>
 }
 
 impl TrailAgg {
-    fn new(nine: usize) -> Self {
+    fn new(seed: usize) -> Self {
         TrailAgg {
-            nines: BTreeSet::from([nine]),
-            distinct: 1,
+            perm: 1,
+            zeros: BTreeSet::from([seed])
         }
     }
 
     fn extend(&mut self, other: &TrailAgg) {
-        self.nines.extend(other.nines.clone());
-        self.distinct += other.distinct
+        self.perm += other.perm;
+        self.zeros.extend(&other.zeros);
     }
 }

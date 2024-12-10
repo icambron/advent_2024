@@ -1,4 +1,5 @@
 use std::fs;
+use std::time::Duration;
 
 pub enum Advent {
     Day(Day, bool),
@@ -64,9 +65,12 @@ pub trait Solver {
 
     fn expected(&self) -> (u64, u64);
 
-    fn solve(&self, day: Day, check: bool) -> (u64, u64) {
+    fn solve(&self, day: Day, check: bool) -> (u64, u64, Duration) {
         let input = load_file(&day.path());
+
+        let time = std::time::Instant::now();
         let (part_1, part_2) = self.run(&input);
+        let elapsed = time.elapsed();
 
         if check {
             let (expected_1, expected_2) = self.expected();
@@ -74,7 +78,7 @@ pub trait Solver {
             assert_eq!(part_2, expected_2);
         }
 
-        (part_1, part_2)
+        (part_1, part_2, elapsed)
     }
 }
 
