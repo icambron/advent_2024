@@ -6,20 +6,17 @@ pub struct Day10;
 impl Solver for Day10 {
     fn run(&self, input: &str) -> (u64, u64) {
         let map = parse(input);
-        // println!("{:?}", map);
-        let p1 = part_1(&map);
-        
-        (p1, 0)
+        compute(&map)
     }
 
     fn expected(&self) -> (u64, u64) {
-        (617, 0)
+        (617, 1477)
     }
 }
 
-fn part_1(map: &Map) -> u64 {
+fn compute(map: &Map) -> (u64, u64) {
     let mut progress : Tracker = map.chars.get(&9).unwrap().iter()
-        .map(|coord| (*coord, BTreeSet::from([*coord])))
+        .map(|coord| (*coord, TrailAgg::new(*coord)))
         .collect();
     
     for i in (0..=8).rev() {
@@ -27,7 +24,7 @@ fn part_1(map: &Map) -> u64 {
         
         let mut next_progress = Tracker::new();
         
-        for (coord, nines) in progress.into_iter() {
+        for (coord, agg) in progress.into_iter() {
             let up = coord - map.width;
             let down = coord + map.width;
             let left = if coord % map.width == 0 {usize::MAX} else { coord - 1 };
@@ -40,8 +37,8 @@ fn part_1(map: &Map) -> u64 {
                 
                 if next_set.contains(dir) {
                     next_progress.entry(*dir)
-                        .and_modify(|e| { e.extend(nines.clone()); })
-                        .or_insert_with(|| nines.clone());
+                        .and_modify(|e| { e.extend(&agg); })
+                        .or_insert_with(|| agg.clone());
                 }
             }
         }
@@ -49,12 +46,13 @@ fn part_1(map: &Map) -> u64 {
         progress = next_progress;
     }
     
-    progress.values().map(|nines| nines.len() as u64).sum()
-
+    progress.values().fold((0, 0), |(nines, distinct), agg| {
+        (nines + agg.nines.len() as u64, distinct + agg.distinct)
+    })
 }
 
 fn parse(input: &str) -> Map {
-    let mut map = Tracker::new();
+    let mut map = CharMap::new();
     let mut width = 0;
     let mut first_row = true;
     let mut size = 0;
@@ -78,11 +76,29 @@ fn parse(input: &str) -> Map {
     Map { chars: map, width, size }
 }
 
-type Tracker = BTreeMap<usize, BTreeSet<usize>>;
+type Tracker = BTreeMap<usize, TrailAgg>;
+type CharMap = BTreeMap<usize, BTreeSet<usize>>;
 
 #[derive(Debug)]
 struct Map {
-    chars: Tracker,
+    chars: CharMap,
     width: usize,
     size: usize,
+}
+
+#[derive(Debug, Clone)]
+struct TrailAgg {
+    nines: BTreeSet<usize>,
+    distinct: u64
+}
+
+impl TrailAgg {
+    fn new(nine: usize) -> Self {
+        TrailAgg { nines: BTreeSet::from([nine]), distinct: 1 }
+    }
+    
+    fn extend(&mut self, other: &TrailAgg) {
+        self.nines.extend(other.nines.clone());
+        self.distinct += other.distinct
+    }
 }
