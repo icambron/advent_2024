@@ -32,7 +32,6 @@ fn run_all(check: bool) {
             input: advent::Input::Real,
         };
 
-
         let (_, _, elapsed) = solver.solve(day, check);
         times.insert(number, elapsed);
     }

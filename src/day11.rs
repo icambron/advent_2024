@@ -1,5 +1,5 @@
 use crate::advent::Solver;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 
 pub struct Day11;
 
@@ -17,13 +17,13 @@ impl Solver for Day11 {
     }
 }
 
-fn count_stones(stones: &[u64], max_gens: u64, lookup: &mut HashMap<(u64, u64), u64>) -> u64 {
+fn count_stones(stones: &[u64], max_gens: u8, lookup: &mut HashMap<(u64, u8), u64>) -> u64 {
     stones
         .iter()
         .fold(0, |acc, stone| acc + count_stone(*stone, max_gens, lookup))
 }
 
-fn count_stone(stone: u64, gens_left: u64, lookup: &mut HashMap<(u64, u64), u64>) -> u64 {
+fn count_stone(stone: u64, gens_left: u8, lookup: &mut HashMap<(u64, u8), u64>) -> u64 {
     if gens_left == 0 {
         return 1;
     }

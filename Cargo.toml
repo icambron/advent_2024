@@ -7,4 +7,4 @@ edition = "2021"
 pico-args = { version = "0.5.0", features = ["short-space-opt", "combined-flags"] }
 regex = "1.11.1"
 itertools = "0.13.0"
-intervaltree = "0.2.7"
+hashbrown = "0.15.2"
