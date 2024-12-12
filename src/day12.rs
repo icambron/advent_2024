@@ -1,5 +1,4 @@
 use crate::advent::Solver;
-use hashbrown::HashSet;
 
 pub struct Day12;
 
@@ -17,15 +16,12 @@ impl Solver for Day12 {
 }
 
 fn solve(map: &Map) -> (u64, u64) {
-    let mut visited: HashSet<usize> = HashSet::new();
+    let mut visited: Vec<bool> = vec![false; map.width * map.height];
+    let mut search_stack: Vec<usize> = Vec::new();
     let mut total_with_perim = 0;
     let mut total_with_sides = 0;
-    let mut search_stack: Vec<usize> = Vec::new();
 
     for i in 0..map.chars.len() {
-        if visited.contains(&i) {
-            continue;
-        }
 
         let mut area = 0;
         let mut perim = 0;
@@ -36,11 +32,13 @@ fn solve(map: &Map) -> (u64, u64) {
         search_stack.push(i);
 
         while let Some(j) = search_stack.pop() {
-            if visited.contains(&j) {
+            let visit_status = visited.get_mut(j).unwrap();
+
+            if *visit_status {
                 continue;
             }
 
-            visited.insert(j);
+            *visit_status = true;
             area += 1;
 
             let n = map.navigate(j, c);
@@ -92,12 +90,13 @@ fn parse(input: &str) -> Map {
     let lines: Vec<&str> = input.lines().collect();
     let width = lines.first().map_or(0, |line| line.len());
     let chars: Vec<char> = lines.concat().chars().collect();
-    Map { chars, width }
+    Map { chars, width, height: lines.len() }
 }
 
 struct Map {
     chars: Vec<char>,
     width: usize,
+    height: usize,
 }
 
 struct Navigation {
@@ -123,25 +122,26 @@ impl Map {
             let ny = y as isize + dy;
             if nx >= 0 && nx < self.width as isize && ny >= 0 && ny < height as isize {
                 let idx = (ny as usize) * self.width + (nx as usize);
-                Some((idx, self.chars[idx]))
+                let c = self.chars[idx];
+                if c == expected {
+                    Some((idx, c))
+                } else {
+                    None
+                }
             } else {
                 None
             }
         };
 
         Navigation {
-            up: smash(neighbor(0, -1), expected),
-            down: smash(neighbor(0, 1), expected),
-            left: smash(neighbor(-1, 0), expected),
-            right: smash(neighbor(1, 0), expected),
-            up_left: smash(neighbor(-1, -1), expected),
-            up_right: smash(neighbor(1, -1), expected),
-            down_left: smash(neighbor(-1, 1), expected),
-            down_right: smash(neighbor(1, 1), expected),
+            up: neighbor(0, -1),
+            down: neighbor(0, 1),
+            left: neighbor(-1, 0),
+            right: neighbor(1, 0),
+            up_left: neighbor(-1, -1),
+            up_right: neighbor(1, -1),
+            down_left: neighbor(-1, 1),
+            down_right: neighbor(1, 1),
         }
     }
-}
-
-fn smash(op: Option<(usize, char)>, expected_char: char) -> Option<(usize, char)> {
-    op.and_then(|next| if next.1 == expected_char { Some(next) } else { None })
 }
