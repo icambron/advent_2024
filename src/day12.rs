@@ -23,12 +23,15 @@ fn solve(map: &Map) -> (u64, u64) {
 
     for i in 0..map.chars.len() {
 
+        if visited[i] {
+            continue;
+        }
+
         let mut area = 0;
         let mut perim = 0;
         let mut sides = 0;
 
         let c = map.chars[i];
-
         search_stack.push(i);
 
         while let Some(j) = search_stack.pop() {
@@ -43,6 +46,7 @@ fn solve(map: &Map) -> (u64, u64) {
 
             let n = map.navigate(j, c);
 
+            // directions to explore
             for neighbor in [
                 n.up, n.down, n.left, n.right
             ] {
@@ -52,7 +56,7 @@ fn solve(map: &Map) -> (u64, u64) {
                 };
             }
 
-            // concave corners
+            // convex corners
             for (no_1, no_2) in [
                 (n.up, n.right),
                 (n.up, n.left),
@@ -64,7 +68,7 @@ fn solve(map: &Map) -> (u64, u64) {
                 }
             }
 
-            // convex corners
+            // concave corners
             for (yes_1, yes_2, no) in [
                 (n.up, n.right, n.up_right),
                 (n.up, n.left, n.up_left),
@@ -78,7 +82,6 @@ fn solve(map: &Map) -> (u64, u64) {
             }
         }
 
-        // global_visited.extend(local_visited.iter());
         total_with_perim += area * perim;
         total_with_sides += area * sides;
     }
@@ -111,11 +114,10 @@ struct Navigation {
 }
 
 impl Map {
-
-    fn navigate(&self, point: usize, expected: char) -> Navigation {
+    fn navigate(&self, coord: usize, expected: char) -> Navigation {
         let height = self.chars.len() / self.width;
-        let x = point % self.width;
-        let y = point / self.width;
+        let x = coord % self.width;
+        let y = coord / self.width;
 
         let neighbor = |dx: isize, dy: isize| {
             let nx = x as isize + dx;
