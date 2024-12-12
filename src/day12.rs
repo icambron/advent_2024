@@ -22,14 +22,13 @@ fn solve(map: &Map) -> (u64, u64) {
     let mut total_with_sides = 0;
 
     for i in 0..map.chars.len() {
-
         if visited[i] {
             continue;
         }
 
         let mut area = 0;
         let mut perim = 0;
-        let mut sides = 0;
+        let mut sides: u64 = 0;
 
         let c = map.chars[i];
         search_stack.push(i);
@@ -47,39 +46,30 @@ fn solve(map: &Map) -> (u64, u64) {
             let n = map.navigate(j, c);
 
             // directions to explore
-            for neighbor in [
-                n.up, n.down, n.left, n.right
-            ] {
-                match neighbor {
-                    Some(next) => search_stack.push(next.0),
-                    None => perim += 1
+            for neighbor in [n.up, n.down, n.left, n.right] {
+                if let Some(next) = neighbor {
+                    search_stack.push(next.0)
+                } else {
+                    perim += 1
                 };
             }
 
             // convex corners
-            for (no_1, no_2) in [
-                (n.up, n.right),
-                (n.up, n.left),
-                (n.down, n.left),
-                (n.down, n.right),
-            ] {
-                if no_1.is_none() && no_2.is_none() {
-                    sides += 1;
-                }
-            }
+            sides += [(n.up, n.right), (n.up, n.left), (n.down, n.left), (n.down, n.right)]
+                .iter()
+                .filter(|&(no_1, no_2)| no_1.is_none() && no_2.is_none())
+                .count() as u64;
 
             // concave corners
-            for (yes_1, yes_2, no) in [
+            sides += [
                 (n.left, n.up, (-1, -1)),
                 (n.right, n.up, (1, -1)),
                 (n.left, n.down, (-1, 1)),
                 (n.right, n.down, (1, 1)),
             ]
-            {
-                if yes_1.is_some() && yes_2.is_some() && n.partial.neighbor(no.0, no.1).is_none() {
-                    sides += 1;
-                }
-            }
+            .iter()
+            .filter(|(yes_1, yes_2, no)| yes_1.is_some() && yes_2.is_some() && n.partial.neighbor(no.0, no.1).is_none())
+            .count() as u64;
         }
 
         total_with_perim += area * perim;
@@ -93,7 +83,11 @@ fn parse(input: &str) -> Map {
     let lines: Vec<&str> = input.lines().collect();
     let width = lines.first().map_or(0, |line| line.len());
     let chars: Vec<char> = lines.concat().chars().collect();
-    Map { chars, width, height: lines.len() }
+    Map {
+        chars,
+        width,
+        height: lines.len(),
+    }
 }
 
 struct Map {
@@ -110,7 +104,7 @@ struct NavPartial<'a> {
     height: usize,
 }
 
-impl <'a> NavPartial<'a> {
+impl<'a> NavPartial<'a> {
     fn neighbor(&self, dx: isize, dy: isize) -> Option<(usize, char)> {
         let nx = self.x as isize + dx;
         let ny = self.y as isize + dy;
@@ -129,29 +123,32 @@ impl <'a> NavPartial<'a> {
 }
 
 struct Navigation<'a> {
-    partial: NavPartial<'a>,
-    
     up: Option<(usize, char)>,
     down: Option<(usize, char)>,
     left: Option<(usize, char)>,
     right: Option<(usize, char)>,
+    partial: NavPartial<'a>,
 }
 
 impl Map {
-    
     fn navigate(&self, coord: usize, expected: char) -> Navigation {
         let height = self.chars.len() / self.width;
         let x = coord % self.width;
         let y = coord / self.width;
-        
-        let partial = NavPartial { x, y, height, map: self, expected };
+
+        let partial = NavPartial {
+            x,
+            y,
+            height,
+            map: self,
+            expected,
+        };
 
         Navigation {
             up: partial.neighbor(0, -1),
             down: partial.neighbor(0, 1),
             left: partial.neighbor(-1, 0),
             right: partial.neighbor(1, 0),
-
             partial,
         }
     }
