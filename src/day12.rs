@@ -70,13 +70,13 @@ fn solve(map: &Map) -> (u64, u64) {
 
             // concave corners
             for (yes_1, yes_2, no) in [
-                (n.up, n.right, n.up_right),
-                (n.up, n.left, n.up_left),
-                (n.down, n.left, n.down_left),
-                (n.down, n.right, n.down_right),
+                (n.left, n.up, (-1, -1)),
+                (n.right, n.up, (1, -1)),
+                (n.left, n.down, (-1, 1)),
+                (n.right, n.down, (1, 1)),
             ]
             {
-                if yes_1.is_some() && yes_2.is_some() && no.is_none() {
+                if yes_1.is_some() && yes_2.is_some() && n.partial.neighbor(no.0, no.1).is_none() {
                     sides += 1;
                 }
             }
@@ -102,48 +102,57 @@ struct Map {
     height: usize,
 }
 
-struct Navigation {
+struct NavPartial<'a> {
+    expected: char,
+    map: &'a Map,
+    x: usize,
+    y: usize,
+    height: usize,
+}
+
+impl <'a> NavPartial<'a> {
+    fn neighbor(&self, dx: isize, dy: isize) -> Option<(usize, char)> {
+        let nx = self.x as isize + dx;
+        let ny = self.y as isize + dy;
+        if nx >= 0 && nx < self.map.width as isize && ny >= 0 && ny < self.height as isize {
+            let idx = (ny as usize) * self.map.width + (nx as usize);
+            let c = self.map.chars[idx];
+            if c == self.expected {
+                Some((idx, c))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+}
+
+struct Navigation<'a> {
+    partial: NavPartial<'a>,
+    
     up: Option<(usize, char)>,
     down: Option<(usize, char)>,
     left: Option<(usize, char)>,
     right: Option<(usize, char)>,
-    up_left: Option<(usize, char)>,
-    up_right: Option<(usize, char)>,
-    down_left: Option<(usize, char)>,
-    down_right: Option<(usize, char)>,
 }
 
 impl Map {
+    
     fn navigate(&self, coord: usize, expected: char) -> Navigation {
         let height = self.chars.len() / self.width;
         let x = coord % self.width;
         let y = coord / self.width;
-
-        let neighbor = |dx: isize, dy: isize| {
-            let nx = x as isize + dx;
-            let ny = y as isize + dy;
-            if nx >= 0 && nx < self.width as isize && ny >= 0 && ny < height as isize {
-                let idx = (ny as usize) * self.width + (nx as usize);
-                let c = self.chars[idx];
-                if c == expected {
-                    Some((idx, c))
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        };
+        
+        let partial = NavPartial { x, y, height, map: self, expected };
 
         Navigation {
-            up: neighbor(0, -1),
-            down: neighbor(0, 1),
-            left: neighbor(-1, 0),
-            right: neighbor(1, 0),
-            up_left: neighbor(-1, -1),
-            up_right: neighbor(1, -1),
-            down_left: neighbor(-1, 1),
-            down_right: neighbor(1, 1),
+            up: partial.neighbor(0, -1),
+            down: partial.neighbor(0, 1),
+            left: partial.neighbor(-1, 0),
+            right: partial.neighbor(1, 0),
+
+            partial,
         }
     }
 }
