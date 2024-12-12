@@ -6,7 +6,7 @@ pub struct Day12;
 impl Solver for Day12 {
     fn run(&self, input: &str) -> (u64, u64) {
         let map = parse(input);
-        let (p1, p2) = part_1(&map);
+        let (p1, p2) = solve(&map);
 
         (p1, p2)
     }
@@ -16,12 +16,12 @@ impl Solver for Day12 {
     }
 }
 
-fn part_1(map: &Map) -> (u64, u64) {
+fn solve(map: &Map) -> (u64, u64) {
     let mut global_visited: HashSet<usize> = HashSet::new();
     let mut local_visited: HashSet<usize> = HashSet::new();
     let mut total_with_perim = 0;
     let mut total_with_sides = 0;
-    let mut search_stack: Vec<(usize, char)> = Vec::new();
+    let mut search_stack: Vec<usize> = Vec::new();
 
     for i in 0..map.chars.len() {
         if global_visited.contains(&i) {
@@ -32,13 +32,13 @@ fn part_1(map: &Map) -> (u64, u64) {
         let mut perim = 0;
         let mut sides = 0;
 
-        let base_char = map.chars[i];
+        let c = map.chars[i];
 
-        search_stack.push((i, base_char));
+        search_stack.push(i);
         local_visited.clear();
 
-        while let Some((j, _)) = search_stack.pop() {
-            if global_visited.contains(&j) || local_visited.contains(&j) {
+        while let Some(j) = search_stack.pop() {
+            if local_visited.contains(&j) {
                 continue;
             }
 
@@ -50,14 +50,10 @@ fn part_1(map: &Map) -> (u64, u64) {
             let mut last_was_fence = false;
             let mut first_was_fence = false;
 
-            for (k, next) in [n.up, n.right, n.down, n.left]
-                .iter()
-                .map(|o| conflate_missing(o, base_char))
-                .enumerate()
-            {
+            for (k, next) in [n.up, n.right, n.down, n.left].iter().map(|o| smash(o, c)).enumerate() {
                 if let Some(next) = next {
                     last_was_fence = false;
-                    search_stack.push(next);
+                    search_stack.push(next.0);
                 } else {
                     if k == 0 {
                         first_was_fence = true;
@@ -84,10 +80,7 @@ fn part_1(map: &Map) -> (u64, u64) {
             ]
             .iter()
             {
-                if conflate_missing(&yes_1, base_char).is_some()
-                    && conflate_missing(&yes_2, base_char).is_some()
-                    && conflate_missing(&no, base_char).is_none()
-                {
+                if smash(yes_1, c).is_some() && smash(yes_2, c).is_some() && smash(no, c).is_none() {
                     sides += 1;
                 }
             }
@@ -101,7 +94,7 @@ fn part_1(map: &Map) -> (u64, u64) {
     (total_with_perim, total_with_sides)
 }
 
-fn conflate_missing(op: &Option<(usize, char)>, expected_char: char) -> Option<(usize, char)> {
+fn smash(op: &Option<(usize, char)>, expected_char: char) -> Option<(usize, char)> {
     op.and_then(|next| if next.1 == expected_char { Some(next) } else { None })
 }
 
