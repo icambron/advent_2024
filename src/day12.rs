@@ -17,14 +17,13 @@ impl Solver for Day12 {
 }
 
 fn solve(map: &Map) -> (u64, u64) {
-    let mut global_visited: HashSet<usize> = HashSet::new();
-    let mut local_visited: HashSet<usize> = HashSet::new();
+    let mut visited: HashSet<usize> = HashSet::new();
     let mut total_with_perim = 0;
     let mut total_with_sides = 0;
     let mut search_stack: Vec<usize> = Vec::new();
 
     for i in 0..map.chars.len() {
-        if global_visited.contains(&i) {
+        if visited.contains(&i) {
             continue;
         }
 
@@ -35,67 +34,58 @@ fn solve(map: &Map) -> (u64, u64) {
         let c = map.chars[i];
 
         search_stack.push(i);
-        local_visited.clear();
 
         while let Some(j) = search_stack.pop() {
-            if local_visited.contains(&j) {
+            if visited.contains(&j) {
                 continue;
             }
 
+            visited.insert(j);
             area += 1;
 
-            local_visited.insert(j);
+            let n = map.navigate(j, c);
 
-            let n = map.navigate(j);
-            let mut last_was_fence = false;
-            let mut first_was_fence = false;
+            for neighbor in [
+                n.up, n.down, n.left, n.right
+            ] {
+                match neighbor {
+                    Some(next) => search_stack.push(next.0),
+                    None => perim += 1
+                };
+            }
 
-            for (k, next) in [n.up, n.right, n.down, n.left].iter().map(|o| smash(o, c)).enumerate() {
-                if let Some(next) = next {
-                    last_was_fence = false;
-                    search_stack.push(next.0);
-                } else {
-                    if k == 0 {
-                        first_was_fence = true;
-                    }
-
-                    if last_was_fence {
-                        sides += 1;
-                    }
-
-                    perim += 1;
-                    last_was_fence = true
+            // concave corners
+            for (no_1, no_2) in [
+                (n.up, n.right),
+                (n.up, n.left),
+                (n.down, n.left),
+                (n.down, n.right),
+            ] {
+                if no_1.is_none() && no_2.is_none() {
+                    sides += 1;
                 }
             }
 
-            if first_was_fence && last_was_fence {
-                sides += 1;
-            }
-
+            // convex corners
             for (yes_1, yes_2, no) in [
                 (n.up, n.right, n.up_right),
                 (n.up, n.left, n.up_left),
                 (n.down, n.left, n.down_left),
                 (n.down, n.right, n.down_right),
             ]
-            .iter()
             {
-                if smash(yes_1, c).is_some() && smash(yes_2, c).is_some() && smash(no, c).is_none() {
+                if yes_1.is_some() && yes_2.is_some() && no.is_none() {
                     sides += 1;
                 }
             }
         }
 
-        global_visited.extend(local_visited.iter());
+        // global_visited.extend(local_visited.iter());
         total_with_perim += area * perim;
         total_with_sides += area * sides;
     }
 
     (total_with_perim, total_with_sides)
-}
-
-fn smash(op: &Option<(usize, char)>, expected_char: char) -> Option<(usize, char)> {
-    op.and_then(|next| if next.1 == expected_char { Some(next) } else { None })
 }
 
 fn parse(input: &str) -> Map {
@@ -122,7 +112,8 @@ struct Navigation {
 }
 
 impl Map {
-    fn navigate(&self, point: usize) -> Navigation {
+
+    fn navigate(&self, point: usize, expected: char) -> Navigation {
         let height = self.chars.len() / self.width;
         let x = point % self.width;
         let y = point / self.width;
@@ -139,14 +130,18 @@ impl Map {
         };
 
         Navigation {
-            up: neighbor(0, -1),
-            down: neighbor(0, 1),
-            left: neighbor(-1, 0),
-            right: neighbor(1, 0),
-            up_left: neighbor(-1, -1),
-            up_right: neighbor(1, -1),
-            down_left: neighbor(-1, 1),
-            down_right: neighbor(1, 1),
+            up: smash(neighbor(0, -1), expected),
+            down: smash(neighbor(0, 1), expected),
+            left: smash(neighbor(-1, 0), expected),
+            right: smash(neighbor(1, 0), expected),
+            up_left: smash(neighbor(-1, -1), expected),
+            up_right: smash(neighbor(1, -1), expected),
+            down_left: smash(neighbor(-1, 1), expected),
+            down_right: smash(neighbor(1, 1), expected),
         }
     }
+}
+
+fn smash(op: Option<(usize, char)>, expected_char: char) -> Option<(usize, char)> {
+    op.and_then(|next| if next.1 == expected_char { Some(next) } else { None })
 }
