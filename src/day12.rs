@@ -5,9 +5,7 @@ pub struct Day12;
 impl Solver for Day12 {
     fn run(&self, input: &str) -> (u64, u64) {
         let map = parse(input);
-        let (p1, p2) = solve(&map);
-
-        (p1, p2)
+        solve(&map)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -28,37 +26,27 @@ fn solve(map: &Map) -> (u64, u64) {
 
         let mut area = 0;
         let mut perim = 0;
-        let mut sides: u64 = 0;
+        let mut sides = 0;
 
         let c = map.chars[i];
         search_stack.push(i);
 
         while let Some(j) = search_stack.pop() {
             let visit_status = visited.get_mut(j).unwrap();
-
             if *visit_status {
                 continue;
             }
-
             *visit_status = true;
+            
             area += 1;
 
             let n = map.navigate(j, c);
-
-            // directions to explore
-            for neighbor in [n.up, n.down, n.left, n.right] {
-                if let Some(next) = neighbor {
-                    search_stack.push(next.0)
-                } else {
-                    perim += 1
-                };
-            }
 
             // convex corners
             sides += [(n.up, n.right), (n.up, n.left), (n.down, n.left), (n.down, n.right)]
                 .iter()
                 .filter(|&(no_1, no_2)| no_1.is_none() && no_2.is_none())
-                .count() as u64;
+                .count();
 
             // concave corners
             sides += [
@@ -69,14 +57,23 @@ fn solve(map: &Map) -> (u64, u64) {
             ]
             .iter()
             .filter(|(yes_1, yes_2, no)| yes_1.is_some() && yes_2.is_some() && n.partial.neighbor(no.0, no.1).is_none())
-            .count() as u64;
+            .count();
+
+            // directions to explore
+            for neighbor in [n.up, n.down, n.left, n.right] {
+                if let Some(next) = neighbor {
+                    search_stack.push(next)
+                } else {
+                    perim += 1
+                };
+            }
         }
 
         total_with_perim += area * perim;
         total_with_sides += area * sides;
     }
 
-    (total_with_perim, total_with_sides)
+    (total_with_perim as u64, total_with_sides as u64)
 }
 
 fn parse(input: &str) -> Map {
@@ -105,14 +102,14 @@ struct NavPartial<'a> {
 }
 
 impl<'a> NavPartial<'a> {
-    fn neighbor(&self, dx: isize, dy: isize) -> Option<(usize, char)> {
+    fn neighbor(&self, dx: isize, dy: isize) -> Option<usize> {
         let nx = self.x as isize + dx;
         let ny = self.y as isize + dy;
         if nx >= 0 && nx < self.map.width as isize && ny >= 0 && ny < self.height as isize {
             let idx = (ny as usize) * self.map.width + (nx as usize);
             let c = self.map.chars[idx];
             if c == self.expected {
-                Some((idx, c))
+                Some(idx)
             } else {
                 None
             }
@@ -123,10 +120,10 @@ impl<'a> NavPartial<'a> {
 }
 
 struct Navigation<'a> {
-    up: Option<(usize, char)>,
-    down: Option<(usize, char)>,
-    left: Option<(usize, char)>,
-    right: Option<(usize, char)>,
+    up: Option<usize>,
+    down: Option<usize>,
+    left: Option<usize>,
+    right: Option<usize>,
     partial: NavPartial<'a>,
 }
 
