@@ -1,4 +1,3 @@
-use regex::Regex;
 use crate::advent::Solver;
 
 pub struct Day13;
@@ -45,23 +44,34 @@ fn solve<F: Fn(i64) -> i64>(parsed: &[Machine], f: F) -> u64  {
 }
 
 fn parse(input: &str) -> Vec<Machine> {
-    let button_re = Regex::new(r"X\+(\d+), Y\+(\d+)").unwrap();
-    let prize_re = Regex::new(r"X=(\d+), Y=(\d+)").unwrap();
-    input.split("\n\n")
-        .map(|group| {
-            let mut lines = group.lines();
-            let button_a = button_re.captures(lines.next().unwrap()).unwrap();
-            let button_b = button_re.captures(lines.next().unwrap()).unwrap();
-            let prize = prize_re.captures(lines.next().unwrap()).unwrap();
-            
-            Machine {
-                button_a: Button { x: button_a[1].parse().unwrap(), y: button_a[2].parse().unwrap() },
-                button_b: Button { x: button_b[1].parse().unwrap(), y: button_b[2].parse().unwrap() },
-                prize_x: prize[1].parse().unwrap(),
-                prize_y: prize[2].parse().unwrap()
-            }
-        })
-        .collect()
+    let mut machines = Vec::new();
+    let mut lines = input.lines().filter(|line| !line.trim().is_empty());
+
+    while let Some(button_a_line) = lines.next() {
+        let button_b_line = lines.next().unwrap();
+        let prize_line = lines.next().unwrap();
+
+        let button_a = parse_coordinates(&button_a_line[10..], "X+", " Y+");
+        let button_b = parse_coordinates(&button_b_line[10..], "X+", " Y+");
+        let (prize_x, prize_y) = parse_coordinates(&prize_line[7..], "X=", " Y=");
+
+        // Create and push the Machine
+        machines.push(Machine {
+            button_a: Button { x: button_a.0, y: button_a.1 },
+            button_b: Button { x: button_b.0, y: button_b.1 },
+            prize_x,
+            prize_y,
+        });
+    }
+
+    machines
+}
+
+fn parse_coordinates(line: &str, x_prefix: &str, y_prefix: &str) -> (i64, i64) {
+    let parts: Vec<_> = line.split(',').collect();
+    let x = parts[0].trim_start_matches(x_prefix).parse::<i64>().unwrap();
+    let y = parts[1].trim_start_matches(y_prefix).parse::<i64>().unwrap();
+    (x, y)
 }
 
 #[derive(Debug, Clone)]
