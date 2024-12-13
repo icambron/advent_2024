@@ -4,16 +4,20 @@ use hashbrown::HashMap;
 pub struct Day11;
 
 impl Solver for Day11 {
-    fn part_1(&self, input: &str) -> u64 {
-        let stones = parse(input);
-        let mut lookup = HashMap::with_capacity(140_000);
-        count_stones(&stones, 25, &mut lookup)
+    type Input = Vec<u64>;
+
+    fn parse(&self, input: &str) -> Self::Input {
+        input.split_whitespace().map(|s| s.parse().unwrap()).collect()
     }
 
-    fn part_2(&self, input: &str) -> u64 {
-        let stones = parse(input);
+    fn part_1(&self, input: &mut Self::Input) -> u64 {
         let mut lookup = HashMap::with_capacity(140_000);
-        count_stones(&stones, 75, &mut lookup)
+        count_stones(input, 25, &mut lookup)
+    }
+
+    fn part_2(&self, input: &mut Self::Input) -> u64 {
+        let mut lookup = HashMap::with_capacity(140_000);
+        count_stones(input, 75, &mut lookup)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -78,6 +82,3 @@ fn split_in_two(num: u64) -> Option<(u64, u64)> {
     Some((high, low))
 }
 
-fn parse(input: &str) -> Vec<u64> {
-    input.split_whitespace().map(|s| s.parse().unwrap()).collect()
-}

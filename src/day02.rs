@@ -3,28 +3,34 @@ use crate::advent::Solver;
 pub struct Day02;
 
 impl Solver for Day02 {
-    fn part_1(&self, input: &str) -> u64 {
-        part_1(&parse(input))
+    type Input = Vec<Vec<i8>>;
+
+    fn parse(&self, input: &str) -> Self::Input {
+        let mut reports = Vec::with_capacity(1000);
+        for line in input.lines() {
+            let levels: Vec<i8> = line
+                .split_whitespace()
+                .map(|s| s.parse::<i8>().expect("Text should be a number"))
+                .collect();
+            reports.push(levels);
+        }
+        reports
     }
 
-    fn part_2(&self, input: &str) -> u64 {
-        part_2(&parse(input))
+    fn part_1(&self, input: &mut Self::Input) -> u64 {
+        input.iter().filter(|report| is_report_safe(report, None)).count() as u64
+    }
+
+    fn part_2(&self, input: &mut Self::Input) -> u64 {
+        input
+            .iter()
+            .filter(|report| report.iter().enumerate().any(|(i, _)| is_report_safe(report, Some(i))))
+            .count() as u64
     }
 
     fn expected(&self) -> (u64, u64) {
         (332, 398)
     }
-}
-
-fn part_1(parsed: &[Vec<i8>]) -> u64 {
-    parsed.iter().filter(|report| is_report_safe(report, None)).count() as u64
-}
-
-fn part_2(parsed: &[Vec<i8>]) -> u64 {
-    parsed
-        .iter()
-        .filter(|report| report.iter().enumerate().any(|(i, _)| is_report_safe(report, Some(i))))
-        .count() as u64
 }
 
 fn is_report_safe(report: &[i8], exclude_index: Option<usize>) -> bool {
@@ -71,18 +77,6 @@ fn ok_higher(prev: i8, level: i8) -> bool {
 
 fn ok_lower(prev: i8, level: i8) -> bool {
     level < prev && level >= prev - 3
-}
-
-fn parse(input: &str) -> Vec<Vec<i8>> {
-    let mut reports = Vec::with_capacity(1000);
-    for line in input.lines() {
-        let levels: Vec<i8> = line
-            .split_whitespace()
-            .map(|s| s.parse::<i8>().expect("Text should be a number"))
-            .collect();
-        reports.push(levels);
-    }
-    reports
 }
 
 enum ReportState {

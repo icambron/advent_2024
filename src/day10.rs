@@ -4,16 +4,42 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct Day10;
 
 impl Solver for Day10 {
-    fn part_1(&self, input: &str) -> u64 {
-        let map = parse(input);
-        let progress = compute(&map);
+    type Input = Map;
 
+    fn parse(&self, input: &str) -> Self::Input {
+        let mut map = CharMap::new();
+        let mut width = 0;
+        let mut first_row = true;
+        let mut size = 0;
+        for c in input.chars() {
+            if c.is_ascii_digit() {
+                if first_row {
+                    width += 1;
+                }
+
+                let num = c.to_digit(10).unwrap() as usize;
+                map.entry(num)
+                    .and_modify(|e| {
+                        e.insert(size);
+                    })
+                    .or_insert_with(|| BTreeSet::from([size]));
+
+                size += 1;
+            } else {
+                first_row = false;
+            }
+        }
+
+        Map { chars: map, width, size }
+    }
+
+    fn part_1(&self, input: &mut Self::Input) -> u64 {
+        let progress = compute(input);
         progress.values().fold(0, |nines, agg| nines + agg.zeros.len() as u64)
     }
 
-    fn part_2(&self, input: &str) -> u64 {
-        let map = parse(input);
-        let progress = compute(&map);
+    fn part_2(&self, input: &mut Self::Input) -> u64 {
+        let progress = compute(input);
         progress.values().fold(0, |distinct, agg| distinct + agg.perm)
     }
 
@@ -68,37 +94,10 @@ fn compute(map: &Map) -> BTreeMap<usize, TrailAgg> {
     progress
 }
 
-fn parse(input: &str) -> Map {
-    let mut map = CharMap::new();
-    let mut width = 0;
-    let mut first_row = true;
-    let mut size = 0;
-    for c in input.chars() {
-        if c.is_ascii_digit() {
-            if first_row {
-                width += 1;
-            }
-
-            let num = c.to_digit(10).unwrap() as usize;
-            map.entry(num)
-                .and_modify(|e| {
-                    e.insert(size);
-                })
-                .or_insert_with(|| BTreeSet::from([size]));
-
-            size += 1;
-        } else {
-            first_row = false;
-        }
-    }
-
-    Map { chars: map, width, size }
-}
-
 type CharMap = BTreeMap<usize, BTreeSet<usize>>;
 
 #[derive(Debug)]
-struct Map {
+pub struct Map {
     chars: CharMap,
     width: usize,
     size: usize,

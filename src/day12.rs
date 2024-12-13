@@ -3,14 +3,25 @@ use crate::advent::Solver;
 pub struct Day12;
 
 impl Solver for Day12 {
-    fn part_1(&self, input: &str) -> u64 {
-        let map = parse(input);
-        solve(&map, false)
+    type Input = Map;
+
+    fn parse(&self, input: &str) -> Self::Input {
+        let lines: Vec<&str> = input.lines().collect();
+        let width = lines.first().map_or(0, |line| line.len());
+        let chars: Vec<char> = lines.concat().chars().collect();
+        Map {
+            chars,
+            width,
+            height: lines.len(),
+        }
     }
 
-    fn part_2(&self, input: &str) -> u64 {
-        let map = parse(input);
-        solve(&map, true)
+    fn part_1(&self, input: &mut Self::Input) -> u64 {
+        solve(input, false)
+    }
+
+    fn part_2(&self, input: &mut Self::Input) -> u64 {
+        solve(input, true)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -90,18 +101,7 @@ fn solve(map: &Map, count_sides: bool) -> u64 {
     }
 }
 
-fn parse(input: &str) -> Map {
-    let lines: Vec<&str> = input.lines().collect();
-    let width = lines.first().map_or(0, |line| line.len());
-    let chars: Vec<char> = lines.concat().chars().collect();
-    Map {
-        chars,
-        width,
-        height: lines.len(),
-    }
-}
-
-struct Map {
+pub struct Map {
     chars: Vec<char>,
     width: usize,
     height: usize,

@@ -3,12 +3,43 @@ use crate::advent::Solver;
 pub struct Day13;
 
 impl Solver for Day13 {
-    fn part_1(&self, input: &str) -> u64 {
-        solve(&parse(input), |prize| prize)
+    type Input = Vec<Machine>;
+
+    fn parse(&self, input: &str) -> Self::Input {
+        let mut machines = Vec::new();
+        let mut lines = input.lines().filter(|line| !line.trim().is_empty());
+
+        while let Some(button_a_line) = lines.next() {
+            let button_b_line = lines.next().unwrap();
+            let prize_line = lines.next().unwrap();
+
+            let button_a = parse_coordinates(&button_a_line[10..], "X+", " Y+");
+            let button_b = parse_coordinates(&button_b_line[10..], "X+", " Y+");
+            let (prize_x, prize_y) = parse_coordinates(&prize_line[7..], "X=", " Y=");
+
+            machines.push(Machine {
+                button_a: Button {
+                    x: button_a.0,
+                    y: button_a.1,
+                },
+                button_b: Button {
+                    x: button_b.0,
+                    y: button_b.1,
+                },
+                prize_x,
+                prize_y,
+            });
+        }
+
+        machines
     }
 
-    fn part_2(&self, input: &str) -> u64 {
-        solve(&parse(input), |prize| prize + 10000000000000)
+    fn part_1(&self, input: &mut Self::Input) -> u64 {
+        solve(input, |prize| prize)
+    }
+
+    fn part_2(&self, input: &mut Self::Input) -> u64 {
+        solve(input, |prize| prize + 10000000000000)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -41,35 +72,6 @@ fn solve<F: Fn(i64) -> i64>(parsed: &[Machine], f: F) -> u64 {
     (a_total * 3 + b_total) as u64
 }
 
-fn parse(input: &str) -> Vec<Machine> {
-    let mut machines = Vec::new();
-    let mut lines = input.lines().filter(|line| !line.trim().is_empty());
-
-    while let Some(button_a_line) = lines.next() {
-        let button_b_line = lines.next().unwrap();
-        let prize_line = lines.next().unwrap();
-
-        let button_a = parse_coordinates(&button_a_line[10..], "X+", " Y+");
-        let button_b = parse_coordinates(&button_b_line[10..], "X+", " Y+");
-        let (prize_x, prize_y) = parse_coordinates(&prize_line[7..], "X=", " Y=");
-
-        machines.push(Machine {
-            button_a: Button {
-                x: button_a.0,
-                y: button_a.1,
-            },
-            button_b: Button {
-                x: button_b.0,
-                y: button_b.1,
-            },
-            prize_x,
-            prize_y,
-        });
-    }
-
-    machines
-}
-
 fn parse_coordinates(line: &str, x_prefix: &str, y_prefix: &str) -> (i64, i64) {
     let parts: Vec<_> = line.split(',').collect();
     let x = parts[0].trim_start_matches(x_prefix).parse::<i64>().unwrap();
@@ -78,7 +80,7 @@ fn parse_coordinates(line: &str, x_prefix: &str, y_prefix: &str) -> (i64, i64) {
 }
 
 #[derive(Debug)]
-struct Machine {
+pub struct Machine {
     button_a: Button,
     button_b: Button,
     prize_x: i64,
@@ -86,7 +88,7 @@ struct Machine {
 }
 
 #[derive(Debug)]
-struct Button {
+pub struct Button {
     x: i64,
     y: i64,
 }

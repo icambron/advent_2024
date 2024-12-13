@@ -2,12 +2,26 @@ use crate::advent::Solver;
 
 pub struct Day07;
 impl Solver for Day07 {
-    fn part_1(&self, input: &str) -> u64 {
-        try_combos(&parse(input), &[Op::Add, Op::Mul])
+    type Input = Vec<Equation>;
+
+    fn parse(&self, input: &str) -> Self::Input {
+        input
+            .lines()
+            .map(|line| {
+                let colon_split = line.split(": ").collect::<Vec<&str>>();
+                let result = colon_split[0].parse::<u64>().unwrap();
+                let args = colon_split[1].split(" ").map(|arg| arg.parse::<u64>().unwrap()).collect();
+                Equation { result, args }
+            })
+            .collect()
     }
 
-    fn part_2(&self, input: &str) -> u64 {
-        try_combos(&parse(input), &[Op::Add, Op::Mul, Op::Concat])
+    fn part_1(&self, input: &mut Self::Input) -> u64 {
+        try_combos(input, &[Op::Add, Op::Mul])
+    }
+
+    fn part_2(&self, input: &mut Self::Input) -> u64 {
+        try_combos(input, &[Op::Add, Op::Mul, Op::Concat])
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -78,20 +92,8 @@ fn unconcat(concat_result: u64, concat_input: u64) -> Option<u64> {
     }
 }
 
-fn parse(input: &str) -> Vec<Equation> {
-    input
-        .lines()
-        .map(|line| {
-            let colon_split = line.split(": ").collect::<Vec<&str>>();
-            let result = colon_split[0].parse::<u64>().unwrap();
-            let args = colon_split[1].split(" ").map(|arg| arg.parse::<u64>().unwrap()).collect();
-            Equation { result, args }
-        })
-        .collect()
-}
-
 #[derive(Debug)]
-struct Equation {
+pub struct Equation {
     result: u64,
     args: Vec<u64>,
 }
