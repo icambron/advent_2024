@@ -4,9 +4,14 @@ use std::collections::BTreeMap;
 pub struct Day01;
 
 impl Solver for Day01 {
-    fn run(&self, input: &str) -> (u64, u64) {
+    fn part_1(&self, input: &str) -> u64 {
         let (list_a, list_b) = parse(input);
-        (part_1(&list_a, &list_b), part_2(&list_a, &list_b))
+        part_1(&list_a, &list_b)
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        let (list_a, list_b) = parse(input);
+        part_2(&list_a, &list_b)
     }
 
     fn expected(&self) -> (u64, u64) {

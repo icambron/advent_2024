@@ -3,11 +3,15 @@ use std::collections::HashSet;
 
 pub struct Day06;
 impl Solver for Day06 {
-    fn run(&self, input: &str) -> (u64, u64) {
+    fn part_1(&self, input: &str) -> u64 {
         let (mut grid, guard) = parse(input);
         let candidate_pos = part_1(&mut grid, guard.clone());
+        (candidate_pos.len() + 1) as u64
+    }
 
-        ((candidate_pos.len() + 1) as u64, part_2(&mut grid, guard, candidate_pos))
+    fn part_2(&self, input: &str) -> u64 {
+        let (mut grid, guard) = parse(input);
+        part_2(&mut grid, guard)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -30,20 +34,24 @@ fn part_1(grid: &mut Grid, mut guard: Guard) -> Vec<(Pos, Dir)> {
     in_order
 }
 
-fn part_2(grid: &mut Grid, mut guard: Guard, candidate_pos: Vec<(Pos, Dir)>) -> u64 {
+fn part_2(grid: &mut Grid, mut guard: Guard) -> u64 {
+    let candidate_pos = part_1(grid, guard.clone());
+
     let mut obstacles_that_worked = 0;
 
     let mut i = 1;
 
     let mut last_pos = guard.pos.clone();
     let mut last_dir = guard.dir;
-    
 
     for (pos, dir) in candidate_pos {
+        if let Some((square, _)) = grid.map.get_mut(pos.y * grid.width + pos.x) {
+            *square = Square::Obstacle;
+        }
+        if let Some((square, _)) = grid.map.get_mut(last_pos.y * grid.width + last_pos.x) {
+            *square = Square::Empty;
+        }
 
-        if let Some((square, _)) = grid.map.get_mut(pos.y * grid.width + pos.x) { *square = Square::Obstacle; }
-        if let Some((square, _)) = grid.map.get_mut(last_pos.y * grid.width + last_pos.x) { *square = Square::Empty; }
-        
         guard.pos = last_pos;
         guard.dir = last_dir;
 
@@ -55,7 +63,7 @@ fn part_2(grid: &mut Grid, mut guard: Guard, candidate_pos: Vec<(Pos, Dir)>) -> 
         }
 
         i += 1;
-        
+
         last_pos = pos;
         last_dir = dir;
     }
@@ -184,7 +192,7 @@ impl Dir {
 #[derive(Debug, PartialEq)]
 enum Advancement {
     Normal,
-    Loop
+    Loop,
 }
 
 #[derive(Debug, Clone)]
@@ -197,24 +205,23 @@ impl Guard {
     pub fn step(&mut self, grid: &mut Grid, round: usize) -> Option<Advancement> {
         let new_pos = grid.travel(&self.pos, &self.dir);
         if let Some(new_pos) = new_pos {
-
             let found = grid.get_mut(&new_pos);
 
             match found {
                 None => None,
                 Some((Square::Empty, marker)) => {
                     self.pos = new_pos;
-                    
+
                     let result = if marker.round == round && marker.dir == self.dir {
                         Advancement::Loop
                     } else {
                         marker.round = round;
                         Advancement::Normal
                     };
-                    
+
                     marker.round = round;
                     marker.dir = self.dir;
-                    
+
                     Some(result)
                 }
                 Some((Square::Obstacle, _)) => {

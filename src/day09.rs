@@ -3,11 +3,14 @@ use crate::advent::Solver;
 pub struct Day09;
 
 impl Solver for Day09 {
-    fn run(&self, input: &str) -> (u64, u64) {
-        let (blocks, slots) = parse(input);
-        let p1 = part_1(&slots);
-        let p2 = part_2(&blocks);
-        (p1, p2)
+    fn part_1(&self, input: &str) -> u64 {
+        let (_, slots) = parse(input);
+        part_1(&slots)
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        let (blocks, _) = parse(input);
+        part_2(&blocks)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -49,32 +52,26 @@ fn part_1(slots: &[Slot]) -> u64 {
 fn part_2(blocks: &[Block]) -> u64 {
     let mut free: Vec<Block> = blocks.iter().filter(|b| matches!(b.slot, Slot::Empty)).cloned().collect();
     let mut offsets: [usize; 9] = [0; 9];
-    
+
     let mut total: usize = 0;
-    
+
     for block in blocks.iter().filter(|b| matches!(b.slot, Slot::File(_))).rev() {
-        
         if let Slot::File(id) = block.slot {
-            
             let offset = offsets[block.size - 1];
-            
+
             if offset > block.start {
                 total += sum(block.start, block.size, id);
                 continue;
             }
-            
-            if let Some((free_index, free_block)) = free.iter_mut()
-                .enumerate()
-                .skip(offset)
-                .find(|(_, b)| b.size >= block.size) {
-                
+
+            if let Some((free_index, free_block)) = free.iter_mut().enumerate().skip(offset).find(|(_, b)| b.size >= block.size) {
                 // don't move blocks forward
                 if free_block.start > block.start {
                     offsets[block.size - 1] = usize::MAX;
                     total += sum(block.start, block.size, id);
                     continue;
                 }
-                
+
                 offsets[block.size - 1] = free_index;
 
                 total += sum(free_block.start, block.size, id);
@@ -83,14 +80,13 @@ fn part_2(blocks: &[Block]) -> u64 {
                 // that turns out to be expensive. Just zero them out and depend on the offsets to usually skip them
                 free_block.size -= block.size;
                 free_block.start += block.size;
-            
             } else {
                 total += sum(block.start, block.size, id);
                 offsets[block.size - 1] = usize::MAX;
-            } 
+            }
         }
     }
-    
+
     total as u64
 }
 

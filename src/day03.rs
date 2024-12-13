@@ -4,9 +4,12 @@ use regex::Regex;
 pub struct Day03;
 
 impl Solver for Day03 {
-    fn run(&self, input: &str) -> (u64, u64) {
-        let file = parse(input);
-        sum_all(&file)
+    fn part_1(&self, input: &str) -> u64 {
+        sum_all(&parse(input), false)
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        sum_all(&parse(input), true)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -14,17 +17,15 @@ impl Solver for Day03 {
     }
 }
 
-fn sum_all(ops: &[Op]) -> (u64, u64) {
-    let mut sum_always_on: u64 = 0;
-    let mut sum_can_be_disabled: u64 = 0;
+fn sum_all(ops: &[Op], can_disable: bool) -> u64 {
+    let mut sum: u64 = 0;
     let mut doing = true;
     for op in ops {
         match op {
             Op::Mul(op1, op2) => {
                 let more = op1 * op2;
-                sum_always_on += more;
-                if doing {
-                    sum_can_be_disabled += more;
+                if doing || !can_disable {
+                    sum += more;
                 }
             }
             Op::Do => doing = true,
@@ -32,7 +33,7 @@ fn sum_all(ops: &[Op]) -> (u64, u64) {
         }
     }
 
-    (sum_always_on, sum_can_be_disabled)
+    sum
 }
 
 fn parse(input: &str) -> Vec<Op> {

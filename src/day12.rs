@@ -3,9 +3,14 @@ use crate::advent::Solver;
 pub struct Day12;
 
 impl Solver for Day12 {
-    fn run(&self, input: &str) -> (u64, u64) {
+    fn part_1(&self, input: &str) -> u64 {
         let map = parse(input);
-        solve(&map)
+        solve(&map, false)
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        let map = parse(input);
+        solve(&map, true)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -13,7 +18,7 @@ impl Solver for Day12 {
     }
 }
 
-fn solve(map: &Map) -> (u64, u64) {
+fn solve(map: &Map, count_sides: bool) -> u64 {
     let mut visited: Vec<bool> = vec![false; map.width * map.height];
     let mut search_stack: Vec<usize> = Vec::new();
     let mut total_with_perim = 0;
@@ -37,43 +42,52 @@ fn solve(map: &Map) -> (u64, u64) {
                 continue;
             }
             *visit_status = true;
-            
+
             area += 1;
 
             let n = map.navigate(j, c);
 
-            // convex corners
-            sides += [(n.up, n.right), (n.up, n.left), (n.down, n.left), (n.down, n.right)]
-                .iter()
-                .filter(|&(no_1, no_2)| no_1.is_none() && no_2.is_none())
-                .count();
+            if count_sides {
+                // convex corners
+                sides += [(n.up, n.right), (n.up, n.left), (n.down, n.left), (n.down, n.right)]
+                    .iter()
+                    .filter(|&(no_1, no_2)| no_1.is_none() && no_2.is_none())
+                    .count();
 
-            // concave corners
-            sides += [
-                (n.left, n.up, (-1, -1)),
-                (n.right, n.up, (1, -1)),
-                (n.left, n.down, (-1, 1)),
-                (n.right, n.down, (1, 1)),
-            ]
-            .iter()
-            .filter(|(yes_1, yes_2, no)| yes_1.is_some() && yes_2.is_some() && n.partial.neighbor(no.0, no.1).is_none())
-            .count();
+                // concave corners
+                sides += [
+                    (n.left, n.up, (-1, -1)),
+                    (n.right, n.up, (1, -1)),
+                    (n.left, n.down, (-1, 1)),
+                    (n.right, n.down, (1, 1)),
+                ]
+                .iter()
+                .filter(|(yes_1, yes_2, no)| yes_1.is_some() && yes_2.is_some() && n.partial.neighbor(no.0, no.1).is_none())
+                .count();
+            }
 
             // directions to explore
             for neighbor in [n.up, n.down, n.left, n.right] {
                 if let Some(next) = neighbor {
                     search_stack.push(next)
-                } else {
+                } else if !count_sides {
                     perim += 1
                 };
             }
         }
 
-        total_with_perim += area * perim;
-        total_with_sides += area * sides;
+        if count_sides {
+            total_with_sides += area * sides;
+        } else {
+            total_with_perim += area * perim;
+        }
     }
 
-    (total_with_perim as u64, total_with_sides as u64)
+    if count_sides {
+        total_with_sides as u64
+    } else {
+        total_with_perim as u64
+    }
 }
 
 fn parse(input: &str) -> Map {

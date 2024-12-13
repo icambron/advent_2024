@@ -3,9 +3,12 @@ use hashbrown::{HashMap, HashSet};
 
 pub struct Day05;
 impl Solver for Day05 {
-    fn run(&self, input: &str) -> (u64, u64) {
-        let parsed = parse(input);
-        (part_1(&parsed), part_2(parsed))
+    fn part_1(&self, input: &str) -> u64 {
+        part_1(&parse(input))
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        part_2(parse(input))
     }
 
     fn expected(&self) -> (u64, u64) {

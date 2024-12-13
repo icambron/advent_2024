@@ -4,9 +4,17 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct Day10;
 
 impl Solver for Day10 {
-    fn run(&self, input: &str) -> (u64, u64) {
+    fn part_1(&self, input: &str) -> u64 {
         let map = parse(input);
-        compute(&map)
+        let progress = compute(&map);
+
+        progress.values().fold(0, |nines, agg| nines + agg.zeros.len() as u64)
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        let map = parse(input);
+        let progress = compute(&map);
+        progress.values().fold(0, |distinct, agg| distinct + agg.perm)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -14,7 +22,7 @@ impl Solver for Day10 {
     }
 }
 
-fn compute(map: &Map) -> (u64, u64) {
+fn compute(map: &Map) -> BTreeMap<usize, TrailAgg> {
     let mut progress: BTreeMap<usize, TrailAgg> = map
         .chars
         .get(&0)
@@ -57,9 +65,7 @@ fn compute(map: &Map) -> (u64, u64) {
         progress = next_progress;
     }
 
-    progress.values().fold((0, 0), |(nines, distinct), agg| {
-        (nines + agg.zeros.len() as u64, distinct + agg.perm)
-    })
+    progress
 }
 
 fn parse(input: &str) -> Map {
@@ -89,7 +95,6 @@ fn parse(input: &str) -> Map {
     Map { chars: map, width, size }
 }
 
-
 type CharMap = BTreeMap<usize, BTreeSet<usize>>;
 
 #[derive(Debug)]
@@ -102,14 +107,14 @@ struct Map {
 #[derive(Debug, Clone)]
 struct TrailAgg {
     perm: u64,
-    zeros: BTreeSet<usize>
+    zeros: BTreeSet<usize>,
 }
 
 impl TrailAgg {
     fn new(seed: usize) -> Self {
         TrailAgg {
             perm: 1,
-            zeros: BTreeSet::from([seed])
+            zeros: BTreeSet::from([seed]),
         }
     }
 

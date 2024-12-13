@@ -3,11 +3,12 @@ use crate::advent::Solver;
 pub struct Day13;
 
 impl Solver for Day13 {
-    fn run(&self, input: &str) -> (u64, u64) {
-        let parsed = parse(input);
-        let p1 = solve(&parsed, |prize| prize);
-        let p2 = solve(&parsed, |prize| prize + 10000000000000);
-        (p1, p2)
+    fn part_1(&self, input: &str) -> u64 {
+        solve(&parse(input), |prize| prize)
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        solve(&parse(input), |prize| prize + 10000000000000)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -15,25 +16,25 @@ impl Solver for Day13 {
     }
 }
 
-fn solve<F: Fn(i64) -> i64>(parsed: &[Machine], f: F) -> u64  {
+fn solve<F: Fn(i64) -> i64>(parsed: &[Machine], f: F) -> u64 {
     let mut a_total = 0;
     let mut b_total = 0;
 
     for machine in parsed {
         let prize_x = f(machine.prize_x);
         let prize_y = f(machine.prize_y);
-        
+
         let denom = (machine.button_a.y * machine.button_b.x) - (machine.button_a.x * machine.button_b.y);
-        
+
         assert_ne!(denom, 0, "we only handle linearly independent buttons");
-        
+
         let num = (prize_y * machine.button_b.x) - (prize_x * machine.button_b.y);
         let a_rem = num % denom;
-        
+
         if a_rem == 0 {
             let a_count = num / denom;
             a_total += a_count;
-            b_total += (prize_x - machine.button_a.x * a_count)/machine.button_b.x;
+            b_total += (prize_x - machine.button_a.x * a_count) / machine.button_b.x;
         }
     }
 
@@ -53,8 +54,14 @@ fn parse(input: &str) -> Vec<Machine> {
         let (prize_x, prize_y) = parse_coordinates(&prize_line[7..], "X=", " Y=");
 
         machines.push(Machine {
-            button_a: Button { x: button_a.0, y: button_a.1 },
-            button_b: Button { x: button_b.0, y: button_b.1 },
+            button_a: Button {
+                x: button_a.0,
+                y: button_a.1,
+            },
+            button_b: Button {
+                x: button_b.0,
+                y: button_b.1,
+            },
             prize_x,
             prize_y,
         });
@@ -75,11 +82,11 @@ struct Machine {
     button_a: Button,
     button_b: Button,
     prize_x: i64,
-    prize_y: i64
+    prize_y: i64,
 }
 
 #[derive(Debug)]
 struct Button {
     x: i64,
-    y: i64
+    y: i64,
 }

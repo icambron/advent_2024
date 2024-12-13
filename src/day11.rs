@@ -4,12 +4,16 @@ use hashbrown::HashMap;
 pub struct Day11;
 
 impl Solver for Day11 {
-    fn run(&self, input: &str) -> (u64, u64) {
-        let stones: Vec<u64> = input.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    fn part_1(&self, input: &str) -> u64 {
+        let stones = parse(input);
         let mut lookup = HashMap::with_capacity(140_000);
-        let p1 = count_stones(&stones, 25, &mut lookup);
-        let p2 = count_stones(&stones, 75, &mut lookup);
-        (p1, p2)
+        count_stones(&stones, 25, &mut lookup)
+    }
+
+    fn part_2(&self, input: &str) -> u64 {
+        let stones = parse(input);
+        let mut lookup = HashMap::with_capacity(140_000);
+        count_stones(&stones, 75, &mut lookup)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -18,9 +22,7 @@ impl Solver for Day11 {
 }
 
 fn count_stones(stones: &[u64], max_gens: u8, lookup: &mut HashMap<(u64, u8), u64>) -> u64 {
-    stones
-        .iter()
-        .fold(0, |acc, stone| acc + count_stone(*stone, max_gens, lookup))
+    stones.iter().fold(0, |acc, stone| acc + count_stone(*stone, max_gens, lookup))
 }
 
 fn count_stone(stone: u64, gens_left: u8, lookup: &mut HashMap<(u64, u8), u64>) -> u64 {
@@ -74,4 +76,8 @@ fn split_in_two(num: u64) -> Option<(u64, u64)> {
     let low = num % divisor;
 
     Some((high, low))
+}
+
+fn parse(input: &str) -> Vec<u64> {
+    input.split_whitespace().map(|s| s.parse().unwrap()).collect()
 }
