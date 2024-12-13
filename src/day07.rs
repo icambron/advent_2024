@@ -18,40 +18,48 @@ fn try_combos(equations: &[Equation], ops: &[Op]) -> u64 {
     let mut sum_ok = 0;
 
     for eq in equations {
+        
         let mut stack: Vec<Entry> = Vec::new();
 
         for op in ops {
             stack.push(Entry {
                 op,
-                depth: 1,
-                partial_sum: eq.args[0],
+                depth: 0,
+                partial_sum: eq.result,
             });
         }
 
-        let arg_length = eq.args.len();
+        let first_arg = eq.args[0];
+        let arg_length = eq.args.len() - 1;
+        let args_reverse: Vec<u64> = eq.args.iter().rev().cloned().collect();
 
-        // it would probably be faster to iterate backwards:
-        // * could check divisibility for the mult ones
-        // * could check prefix for the concat ones
-        // but that sounds complicated and this one is 30ms on my machine, which is...fine
         while let Some(entry) = stack.pop() {
-            if let Some(arg) = eq.args.get(entry.depth) {
-                let partial_sum = match entry.op {
-                    Op::Add => entry.partial_sum + *arg,
-                    Op::Mul => entry.partial_sum * *arg,
-                    Op::Concat => concat_numbers(entry.partial_sum, *arg),
+            
+            if let Some(arg) = args_reverse.get(entry.depth) {
+                let partial_sum_maybe= match entry.op {
+                    Op::Add => {
+                        entry.partial_sum.checked_sub(*arg)
+                    },
+                    Op::Mul => {
+                        if entry.partial_sum % *arg != 0 {
+                            None
+                        } else {
+                            Some(entry.partial_sum / *arg)
+                        }
+                    },
+                    Op::Concat => unconcat(entry.partial_sum, *arg),
                 };
 
                 let depth = entry.depth + 1;
-
-                if depth == arg_length && partial_sum == eq.result {
-                    sum_ok += eq.result;
-                    break;
-                } else if partial_sum > eq.result {
-                    continue;
-                } else if depth < arg_length {
-                    for op in ops {
-                        stack.push(Entry { op, depth, partial_sum });
+                
+                if let Some (partial_sum)  = partial_sum_maybe {
+                    if depth == arg_length && partial_sum == first_arg {
+                        sum_ok += eq.result;
+                        break;
+                    } else if depth < arg_length {
+                        for op in ops {
+                            stack.push(Entry { op, depth, partial_sum });
+                        }
                     }
                 }
             }
@@ -61,17 +69,16 @@ fn try_combos(equations: &[Equation], ops: &[Op]) -> u64 {
     sum_ok
 }
 
-// this turns out to be much much faster than format + concat + parse, presumably because that allocates a string
-fn concat_numbers(a: u64, b: u64) -> u64 {
-    let mut multiplier = 1;
-    let mut temp = b;
-
-    while temp > 0 {
-        multiplier *= 10;
-        temp /= 10;
+fn unconcat(concat_result: u64, concat_input: u64) -> Option<u64> {
+    let concat_result = concat_result.to_string();
+    let concat_input = concat_input.to_string();
+    
+    if concat_result.len() > concat_input.len() && concat_result.ends_with(&concat_input) {
+        let unconccated = concat_result.split_at(concat_result.len() - concat_input.len()).0;
+        Some(unconccated.parse().unwrap())
+    } else {
+        None
     }
-
-    a * multiplier + b
 }
 
 fn parse(input: &str) -> Vec<Equation> {
@@ -104,4 +111,18 @@ struct Entry<'a> {
     op: &'a Op,
     depth: usize,
     partial_sum: u64,
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_unconcat() {
+        assert_eq!(unconcat(123, 3), Some(12));
+        assert_eq!(unconcat(123, 23), Some(1));
+        assert_eq!(unconcat(123, 123), None);
+        assert_eq!(unconcat(123, 4), None);
+    }
 }

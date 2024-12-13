@@ -48,7 +48,7 @@ fn part_2(grid: &mut Grid, mut guard: Guard, candidate_pos: Vec<(Pos, Dir)>) -> 
         guard.dir = last_dir;
 
         while let Some(result) = guard.step(grid, i + 1) {
-            if result == Result::Loop {
+            if result == Advancement::Loop {
                 obstacles_that_worked += 1;
                 break;
             }
@@ -182,7 +182,7 @@ impl Dir {
 }
 
 #[derive(Debug, PartialEq)]
-enum Result {
+enum Advancement {
     Normal,
     Loop
 }
@@ -194,7 +194,7 @@ struct Guard {
 }
 
 impl Guard {
-    pub fn step(&mut self, grid: &mut Grid, round: usize) -> Option<Result> {
+    pub fn step(&mut self, grid: &mut Grid, round: usize) -> Option<Advancement> {
         let new_pos = grid.travel(&self.pos, &self.dir);
         if let Some(new_pos) = new_pos {
 
@@ -206,10 +206,10 @@ impl Guard {
                     self.pos = new_pos;
                     
                     let result = if marker.round == round && marker.dir == self.dir {
-                        Result::Loop
+                        Advancement::Loop
                     } else {
                         marker.round = round;
-                        Result::Normal
+                        Advancement::Normal
                     };
                     
                     marker.round = round;
