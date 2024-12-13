@@ -42,15 +42,15 @@ fn run_all(check: bool) {
     }
 
     let total: Duration = times.values().map(|(parse, one, two)| *parse + *one + *two).sum();
-    
+
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
     table.set_titles(row!["Day", "Parse (µs)", "Part 1 (µs)", "Part 2 (µs)"]);
 
     for (day, (parse, time_1, time_2)) in times {
-        table.add_row(row![day, parse.as_micros(), time_1.as_micros(), time_2.as_micros()]);
+        table.add_row(row![r -> day, r -> parse.as_micros(), r -> time_1.as_micros(), r -> time_2.as_micros()]);
     }
-    
+
     table.printstd();
     println!("Total: {:?}", total);
 }
@@ -60,9 +60,9 @@ fn run_one(day: Day, check: bool) {
     let solver = days.get(day.number - 1).expect("Day not found");
 
     let (parse, part_1, part_2) = solver.solve(day, check);
-    
+
     println!("Parse time: {:?}", parse);
-    
+
     if let Some((part_1, elapsed)) = part_1 {
         println!("Part 1: {}\t{:?}", part_1, elapsed);
     }
