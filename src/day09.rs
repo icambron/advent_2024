@@ -4,9 +4,9 @@ pub struct Day09;
 
 impl Solver for Day09 {
     fn run(&self, input: &str) -> (u64, u64) {
-        let (blocks, slots) = parse(input);
+        let (blocks, mut slots) = parse(input);
         let p1 = part_1(&slots);
-        let p2 = part_2(&blocks, slots);
+        let p2 = part_2(&blocks, &mut slots);
         (p1, p2)
     }
 
@@ -46,34 +46,38 @@ fn part_1(slots: &[Slot]) -> u64 {
     checksum as u64
 }
 
-fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
+fn part_2(blocks: &[Block], slots: &mut [Slot]) -> u64 {
     let mut free: Vec<Block> = blocks.iter().filter(|b| matches!(b.slot, Slot::Empty)).cloned().collect();
-    let mut smallest_failed = 10;
+    let mut offsets: [usize; 9] = [0; 9];
+    
+    const PADDED_MAX: usize = usize::MAX - 1000;
 
-    for block in blocks.iter().rev() {
+    for block in blocks.iter().filter(|b| matches!(b.slot, Slot::File(_))).rev() {
 
-        // minor and sort of silly optimization -- if we can't find any blocks at all, we're done. This barely moves the benchmarks
-        if smallest_failed == 1 {
-            break;
-        }
+         if offsets[0] == PADDED_MAX {
+             break;
+         }
         
         if let Slot::File(id) = block.slot {
             
-            // minor and sort of silly optimization -- don't try to find free blocks if we know for sure there are none less
-            if smallest_failed < block.size {
+            let offset = offsets[block.size - 1];
+            
+            if  offset > block.start {
                 continue;
             }
             
-            // how to more quickly find free blocks? There has to be a way, but I can't for the life of me come up with one
-            if let Some((free_index, free_block)) = free.iter_mut().enumerate().find(|(_, b)| b.size >= block.size) {
+            if let Some((free_index, free_block)) = free.iter_mut()
+                .enumerate()
+                .skip(offset)
+                .find(|(_, b)| b.size >= block.size) {
                 
                 // don't move blocks forward
                 if free_block.start > block.start {
-                    if smallest_failed > block.size {
-                        smallest_failed = block.size;
-                    }
+                    offsets[block.size - 1] = usize::MAX;
                     continue;
                 }
+                
+                offsets[block.size - 1] = free_index;
 
                 let new_slice = &mut slots[free_block.start..free_block.start + block.size];
                 new_slice.fill(Slot::File(id));
@@ -81,23 +85,17 @@ fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
                 let old_slice = &mut slots[block.start..block.start + block.size];
                 old_slice.fill(Slot::Empty);
 
-                if free_block.size > block.size {
-                    free_block.size -= block.size;
-                    free_block.start += block.size;
-                } else {
-                    free.remove(free_index);
-                }
+                // huge optimization -- we DON'T remove completely used blocks from the free list, because
+                // that turns out to be expensive. Just zero them out and depend on the offsets to usually skip them
+                free_block.size -= block.size;
+                free_block.start += block.size;
+            
             } else {
-                println!("failed to find free block for {}", id);
-                if smallest_failed > block.size {
-                    smallest_failed = block.size;
-                }
+                offsets[block.size - 1] = usize::MAX;
             } 
         }
     }
     
-    println!("smallest failed: {}", smallest_failed);
-
     slots
         .iter()
         .enumerate()
