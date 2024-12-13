@@ -1,5 +1,5 @@
 use crate::advent::Solver;
-use std::collections::{BTreeMap, HashSet};
+use hashbrown::{HashMap, HashSet};
 
 pub struct Day05;
 impl Solver for Day05 {
@@ -44,7 +44,7 @@ fn part_2(parsed: Update) -> u64 {
 }
 
 fn is_correct(page_set: &[usize], rules: &HashSet<(usize, usize)>) -> bool {
-    let page_map = page_set.iter().enumerate().map(|(i, p)| (p, i)).collect::<BTreeMap<_, _>>();
+    let page_map = page_set.iter().enumerate().map(|(i, p)| (p, i)).collect::<HashMap<_, _>>();
     for rule in rules {
         if let Some(first) = page_map.get(&rule.0) {
             if let Some(second) = page_map.get(&rule.1) {

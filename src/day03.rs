@@ -6,9 +6,7 @@ pub struct Day03;
 impl Solver for Day03 {
     fn run(&self, input: &str) -> (u64, u64) {
         let file = parse(input);
-        let part_1 = sum_all(&file, false);
-        let part_2 = sum_all(&file, true);
-        (part_1, part_2)
+        sum_all(&file)
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -16,21 +14,25 @@ impl Solver for Day03 {
     }
 }
 
-fn sum_all(ops: &[Op], allow_disable: bool) -> u64 {
-    let mut sum = 0;
+fn sum_all(ops: &[Op]) -> (u64, u64) {
+    let mut sum_always_on: u64 = 0;
+    let mut sum_can_be_disabled: u64 = 0;
     let mut doing = true;
     for op in ops {
         match op {
             Op::Mul(op1, op2) => {
-                if doing || !allow_disable {
-                    sum += op1 * op2
+                let more = op1 * op2;
+                sum_always_on += more;
+                if doing {
+                    sum_can_be_disabled += more;
                 }
             }
             Op::Do => doing = true,
             Op::Dont => doing = false,
         }
     }
-    sum as u64
+
+    (sum_always_on, sum_can_be_disabled)
 }
 
 fn parse(input: &str) -> Vec<Op> {
@@ -54,7 +56,7 @@ fn parse(input: &str) -> Vec<Op> {
 
 #[derive(Debug)]
 enum Op {
-    Mul(i64, i64),
+    Mul(u64, u64),
     Do,
     Dont,
 }

@@ -7,7 +7,7 @@ impl Solver for Day06 {
         let (grid, guard) = parse(input);
         let candidate_pos = part_1(&grid, guard.clone());
 
-        (candidate_pos.len() as u64, part_2(&grid, guard, candidate_pos))
+        ((candidate_pos.len() + 1) as u64, part_2(&grid, guard, candidate_pos))
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -15,19 +15,22 @@ impl Solver for Day06 {
     }
 }
 
-fn part_1(grid: &Grid, mut guard: Guard) -> HashSet<Pos> {
+fn part_1(grid: &Grid, mut guard: Guard) -> Vec<(Pos, Dir)> {
     let mut visited = HashSet::new();
+    let mut in_order = Vec::new();
 
     visited.insert(guard.pos.clone());
 
     while guard.step(grid, &None) {
-        visited.insert(guard.pos.clone());
+        if visited.insert(guard.pos.clone()) {
+            in_order.push((guard.pos.clone(), guard.dir));
+        }
     }
 
-    visited
+    in_order
 }
 
-fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) -> u64 {
+fn part_2(grid: &Grid, mut guard: Guard, candidate_pos: Vec<(Pos, Dir)>) -> u64 {
     let mut obstacles_that_worked = 0;
 
     let mut i = 1;
@@ -35,28 +38,31 @@ fn part_2(grid: &Grid, guard: Guard, candidate_pos: HashSet<Pos>) -> u64 {
     // a hashset was way too slow, switched to a 1-d vec of dir; only need to store last dir because can only loop in rectangles
     // ideally, we'd integrate this into the grid to avoid the second lookup, but that looked complicated and this is plenty fast
     let mut visited = vec![(0, Dir::Up); grid.width * grid.height];
+    let mut last_pos = guard.pos.clone();
+    let mut last_dir = guard.dir;
 
-    for pos in candidate_pos {
-        // can't put a new obstacle in the same place as the guard
-        if pos == guard.pos {
-            continue;
-        }
+    for (pos, dir) in candidate_pos {
+        
+        guard.pos = last_pos;
+        guard.dir = last_dir;
 
-        let mut new_guard = guard.clone();
         let pos = Some(pos);
 
-        while new_guard.step(grid, &pos) {
-            let (j, dir) = visited.get_mut(new_guard.pos.y * grid.width + new_guard.pos.x).unwrap();
-            if *j == i && *dir == new_guard.dir {
+        while guard.step(grid, &pos) {
+            let (j, dir) = visited.get_mut(guard.pos.y * grid.width + guard.pos.x).unwrap();
+            if *j == i && *dir == guard.dir {
                 obstacles_that_worked += 1;
                 break;
             }
 
             *j = i;
-            *dir = new_guard.dir;
+            *dir = guard.dir;
         }
 
         i += 1;
+        
+        last_pos = Option::unwrap(pos);
+        last_dir = dir;
     }
 
     obstacles_that_worked
