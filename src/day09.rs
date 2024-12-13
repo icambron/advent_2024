@@ -4,9 +4,9 @@ pub struct Day09;
 
 impl Solver for Day09 {
     fn run(&self, input: &str) -> (u64, u64) {
-        let (blocks, mut slots) = parse(input);
+        let (blocks, slots) = parse(input);
         let p1 = part_1(&slots);
-        let p2 = part_2(&blocks, &mut slots);
+        let p2 = part_2(&blocks);
         (p1, p2)
     }
 
@@ -46,23 +46,20 @@ fn part_1(slots: &[Slot]) -> u64 {
     checksum as u64
 }
 
-fn part_2(blocks: &[Block], slots: &mut [Slot]) -> u64 {
+fn part_2(blocks: &[Block]) -> u64 {
     let mut free: Vec<Block> = blocks.iter().filter(|b| matches!(b.slot, Slot::Empty)).cloned().collect();
     let mut offsets: [usize; 9] = [0; 9];
     
-    const PADDED_MAX: usize = usize::MAX - 1000;
-
+    let mut total: usize = 0;
+    
     for block in blocks.iter().filter(|b| matches!(b.slot, Slot::File(_))).rev() {
-
-         if offsets[0] == PADDED_MAX {
-             break;
-         }
         
         if let Slot::File(id) = block.slot {
             
             let offset = offsets[block.size - 1];
             
-            if  offset > block.start {
+            if offset > block.start {
+                total += sum(block.start, block.size, id);
                 continue;
             }
             
@@ -74,16 +71,13 @@ fn part_2(blocks: &[Block], slots: &mut [Slot]) -> u64 {
                 // don't move blocks forward
                 if free_block.start > block.start {
                     offsets[block.size - 1] = usize::MAX;
+                    total += sum(block.start, block.size, id);
                     continue;
                 }
                 
                 offsets[block.size - 1] = free_index;
 
-                let new_slice = &mut slots[free_block.start..free_block.start + block.size];
-                new_slice.fill(Slot::File(id));
-
-                let old_slice = &mut slots[block.start..block.start + block.size];
-                old_slice.fill(Slot::Empty);
+                total += sum(free_block.start, block.size, id);
 
                 // huge optimization -- we DON'T remove completely used blocks from the free list, because
                 // that turns out to be expensive. Just zero them out and depend on the offsets to usually skip them
@@ -91,16 +85,18 @@ fn part_2(blocks: &[Block], slots: &mut [Slot]) -> u64 {
                 free_block.start += block.size;
             
             } else {
+                total += sum(block.start, block.size, id);
                 offsets[block.size - 1] = usize::MAX;
             } 
         }
     }
     
-    slots
-        .iter()
-        .enumerate()
-        .map(|(i, slot)| if let Slot::File(id) = slot { (i * *id) as u64 } else { 0 })
-        .sum()
+    total as u64
+}
+
+fn sum(start: usize, count: usize, id: usize) -> usize {
+    let m = start + count - 1;
+    count * (start + m) / 2 * id
 }
 
 fn parse(input: &str) -> (Vec<Block>, Vec<Slot>) {
