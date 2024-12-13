@@ -4,10 +4,10 @@ use std::collections::HashSet;
 pub struct Day06;
 impl Solver for Day06 {
     fn run(&self, input: &str) -> (u64, u64) {
-        let (grid, guard) = parse(input);
-        let candidate_pos = part_1(&grid, guard.clone());
+        let (mut grid, guard) = parse(input);
+        let candidate_pos = part_1(&mut grid, guard.clone());
 
-        ((candidate_pos.len() + 1) as u64, part_2(&grid, guard, candidate_pos))
+        ((candidate_pos.len() + 1) as u64, part_2(&mut grid, guard, candidate_pos))
     }
 
     fn expected(&self) -> (u64, u64) {
@@ -15,13 +15,13 @@ impl Solver for Day06 {
     }
 }
 
-fn part_1(grid: &Grid, mut guard: Guard) -> Vec<(Pos, Dir)> {
+fn part_1(grid: &mut Grid, mut guard: Guard) -> Vec<(Pos, Dir)> {
     let mut visited = HashSet::new();
     let mut in_order = Vec::new();
 
     visited.insert(guard.pos.clone());
 
-    while guard.step(grid, &None) {
+    while guard.step(grid, 0).is_some() {
         if visited.insert(guard.pos.clone()) {
             in_order.push((guard.pos.clone(), guard.dir));
         }
@@ -30,38 +30,33 @@ fn part_1(grid: &Grid, mut guard: Guard) -> Vec<(Pos, Dir)> {
     in_order
 }
 
-fn part_2(grid: &Grid, mut guard: Guard, candidate_pos: Vec<(Pos, Dir)>) -> u64 {
+fn part_2(grid: &mut Grid, mut guard: Guard, candidate_pos: Vec<(Pos, Dir)>) -> u64 {
     let mut obstacles_that_worked = 0;
 
     let mut i = 1;
 
-    // a hashset was way too slow, switched to a 1-d vec of dir; only need to store last dir because can only loop in rectangles
-    // ideally, we'd integrate this into the grid to avoid the second lookup, but that looked complicated and this is plenty fast
-    let mut visited = vec![(0, Dir::Up); grid.width * grid.height];
     let mut last_pos = guard.pos.clone();
     let mut last_dir = guard.dir;
+    
 
     for (pos, dir) in candidate_pos {
+
+        if let Some((square, _)) = grid.map.get_mut(pos.y * grid.width + pos.x) { *square = Square::Obstacle; }
+        if let Some((square, _)) = grid.map.get_mut(last_pos.y * grid.width + last_pos.x) { *square = Square::Empty; }
         
         guard.pos = last_pos;
         guard.dir = last_dir;
 
-        let pos = Some(pos);
-
-        while guard.step(grid, &pos) {
-            let (j, dir) = visited.get_mut(guard.pos.y * grid.width + guard.pos.x).unwrap();
-            if *j == i && *dir == guard.dir {
+        while let Some(result) = guard.step(grid, i + 1) {
+            if result == Result::Loop {
                 obstacles_that_worked += 1;
                 break;
             }
-
-            *j = i;
-            *dir = guard.dir;
         }
 
         i += 1;
         
-        last_pos = Option::unwrap(pos);
+        last_pos = pos;
         last_dir = dir;
     }
 
@@ -91,7 +86,7 @@ fn parse(input: &str) -> (Grid, Guard) {
                     Square::Empty
                 }
             };
-            map.push(square);
+            map.push((square, Marker { round: 0, dir: Dir::Up }));
         }
     }
 
@@ -103,15 +98,21 @@ fn parse(input: &str) -> (Grid, Guard) {
 }
 
 #[derive(Debug)]
+struct Marker {
+    round: usize,
+    dir: Dir,
+}
+
+#[derive(Debug)]
 struct Grid {
     width: usize,
     height: usize,
-    map: Vec<Square>,
+    map: Vec<(Square, Marker)>,
 }
 
 impl Grid {
-    fn get(&self, pos: &Pos) -> Option<&Square> {
-        self.map.get(pos.y * self.width + pos.x)
+    fn get_mut(&mut self, pos: &Pos) -> Option<&mut (Square, Marker)> {
+        self.map.get_mut(pos.y * self.width + pos.x)
     }
 
     fn travel(&self, pos: &Pos, dir: &Dir) -> Option<Pos> {
@@ -180,6 +181,12 @@ impl Dir {
     }
 }
 
+#[derive(Debug, PartialEq)]
+enum Result {
+    Normal,
+    Loop
+}
+
 #[derive(Debug, Clone)]
 struct Guard {
     dir: Dir,
@@ -187,31 +194,36 @@ struct Guard {
 }
 
 impl Guard {
-    pub fn step(&mut self, grid: &Grid, obstacle: &Option<Pos>) -> bool {
+    pub fn step(&mut self, grid: &mut Grid, round: usize) -> Option<Result> {
         let new_pos = grid.travel(&self.pos, &self.dir);
         if let Some(new_pos) = new_pos {
-            if let Some(obstacle) = obstacle {
-                if new_pos == *obstacle {
-                    self.dir = self.dir.rotate_right();
-                    return self.step(grid, &Some(obstacle.clone()));
-                }
-            }
 
-            let found = grid.get(&new_pos);
+            let found = grid.get_mut(&new_pos);
 
             match found {
-                None => false,
-                Some(Square::Empty) => {
+                None => None,
+                Some((Square::Empty, marker)) => {
                     self.pos = new_pos;
-                    true
+                    
+                    let result = if marker.round == round && marker.dir == self.dir {
+                        Result::Loop
+                    } else {
+                        marker.round = round;
+                        Result::Normal
+                    };
+                    
+                    marker.round = round;
+                    marker.dir = self.dir;
+                    
+                    Some(result)
                 }
-                Some(Square::Obstacle) => {
+                Some((Square::Obstacle, _)) => {
                     self.dir = self.dir.rotate_right();
-                    self.step(grid, obstacle)
+                    self.step(grid, round)
                 }
             }
         } else {
-            false
+            None
         }
     }
 }
