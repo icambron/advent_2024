@@ -48,12 +48,30 @@ fn part_1(slots: &[Slot]) -> u64 {
 
 fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
     let mut free: Vec<Block> = blocks.iter().filter(|b| matches!(b.slot, Slot::Empty)).cloned().collect();
+    let mut smallest_failed = 10;
 
     for block in blocks.iter().rev() {
+
+        // minor and sort of silly optimization -- if we can't find any blocks at all, we're done. This barely moves the benchmarks
+        if smallest_failed == 1 {
+            break;
+        }
+        
         if let Slot::File(id) = block.slot {
+            
+            // minor and sort of silly optimization -- don't try to find free blocks if we know for sure there are none less
+            if smallest_failed < block.size {
+                continue;
+            }
+            
+            // how to more quickly find free blocks? There has to be a way, but I can't for the life of me come up with one
             if let Some((free_index, free_block)) = free.iter_mut().enumerate().find(|(_, b)| b.size >= block.size) {
+                
                 // don't move blocks forward
                 if free_block.start > block.start {
+                    if smallest_failed > block.size {
+                        smallest_failed = block.size;
+                    }
                     continue;
                 }
 
@@ -69,9 +87,16 @@ fn part_2(blocks: &[Block], mut slots: Vec<Slot>) -> u64 {
                 } else {
                     free.remove(free_index);
                 }
-            }
+            } else {
+                println!("failed to find free block for {}", id);
+                if smallest_failed > block.size {
+                    smallest_failed = block.size;
+                }
+            } 
         }
     }
+    
+    println!("smallest failed: {}", smallest_failed);
 
     slots
         .iter()
