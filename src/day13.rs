@@ -17,12 +17,10 @@ impl Solver for Day13 {
 }
 
 fn solve<F: Fn(i64) -> i64>(parsed: &[Machine], f: F) -> u64  {
-
     let mut a_total = 0;
     let mut b_total = 0;
 
     for machine in parsed {
-        
         let prize_x = f(machine.prize_x);
         let prize_y = f(machine.prize_y);
         
@@ -55,7 +53,6 @@ fn parse(input: &str) -> Vec<Machine> {
         let button_b = parse_coordinates(&button_b_line[10..], "X+", " Y+");
         let (prize_x, prize_y) = parse_coordinates(&prize_line[7..], "X=", " Y=");
 
-        // Create and push the Machine
         machines.push(Machine {
             button_a: Button { x: button_a.0, y: button_a.1 },
             button_b: Button { x: button_b.0, y: button_b.1 },
@@ -74,7 +71,7 @@ fn parse_coordinates(line: &str, x_prefix: &str, y_prefix: &str) -> (i64, i64) {
     (x, y)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 struct Machine {
     button_a: Button,
     button_b: Button,
@@ -82,7 +79,7 @@ struct Machine {
     prize_y: i64
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 struct Button {
     x: i64,
     y: i64
