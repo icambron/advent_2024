@@ -13,6 +13,11 @@ impl Advent {
         let day = pargs.opt_value_from_str(["-d", "--day"]).unwrap();
         let all = pargs.contains(["-a", "--all"]);
         let check = pargs.contains(["-c", "--check"]);
+        let sample = pargs.contains(["-s", "--sample"]);
+        
+        if sample && (check || all) {
+            panic!("Cannot use -s with -c or -a")
+        }
 
         if all {
             Self::All(check)
@@ -20,7 +25,7 @@ impl Advent {
             Self::Day(
                 Day {
                     number: day,
-                    input: Input::new(pargs.contains(["-s", "--sample"])),
+                    input: Input::new(sample),
                 },
                 check,
             )

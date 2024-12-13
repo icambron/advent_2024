@@ -7,7 +7,6 @@ impl Solver for Day13 {
         let parsed = parse(input);
         let p1 = solve(&parsed, |prize| prize);
         let p2 = solve(&parsed, |prize| prize + 10000000000000);
-        
         (p1, p2)
     }
 
