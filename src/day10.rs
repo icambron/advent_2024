@@ -29,7 +29,7 @@ fn compute(map: &Map) -> (u64, u64) {
         let mut next_progress: BTreeMap<usize, TrailAgg> = BTreeMap::new();
 
         for (coord, agg) in progress.into_iter() {
-            let up = coord - map.width;
+            let up = coord.overflowing_sub(map.width).0;
             let down = coord + map.width;
             let left = if coord % map.width == 0 { usize::MAX } else { coord - 1 };
             let right = if coord % map.width == map.width - 1 {

@@ -11,6 +11,7 @@ mod day09;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
 
 use crate::advent::{Advent, Solver};
 use advent::Day;
@@ -72,5 +73,6 @@ fn days() -> Vec<&'static dyn Solver> {
         &day10::Day10,
         &day11::Day11,
         &day12::Day12,
+        &day13::Day13,
     ]
 }
