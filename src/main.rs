@@ -15,9 +15,9 @@ mod day13;
 
 use crate::advent::{Advent, Solution, Solvifier};
 use advent::Day;
+use prettytable::{format, row, Table};
 use std::collections::BTreeMap;
 use std::time::Duration;
-use prettytable::{format, row, Table};
 
 fn main() {
     match Advent::parse_args() {
@@ -41,14 +41,24 @@ fn run_all(check: bool) {
         times.insert(number, solution);
     }
 
-    let total: Duration = times.values().map(|sol| sol.parse_duration + sol.part_1.unwrap().1 + sol.part_2.unwrap().1).sum();
+    let total: Duration = times
+        .values()
+        .map(|sol| sol.parse_duration + sol.part_1.unwrap().1 + sol.part_2.unwrap().1)
+        .sum();
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-    table.set_titles(row!["Day", "Name", "Parse (µs)", "Part 1 (µs)", "Part 2 (µs)"]);
+    table.set_titles(row!["Day", "Name", "Parse (µs)", "Part 1 (µs)", "Part 2 (µs)", "Total (µs)"]);
 
     for (day, sol) in times {
-        table.add_row(row![r -> day, l -> sol.name, r -> sol.parse_duration.as_micros(), r -> sol.part_1.unwrap().1.as_micros(), r -> sol.part_2.unwrap().1.as_micros()]);
+        table.add_row(row![
+            r -> day,
+            l -> sol.name,
+            r -> sol.parse_duration.as_micros(),
+            r -> sol.part_1.unwrap().1.as_micros(),
+            r -> sol.part_2.unwrap().1.as_micros(),
+            r -> sol.parse_duration.as_micros() + sol.part_1.unwrap().1.as_micros() + sol.part_2.unwrap().1.as_micros()
+        ]);
     }
 
     table.printstd();
