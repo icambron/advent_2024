@@ -12,6 +12,7 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
+mod day14;
 
 use crate::advent::{Advent, Solution, Solvifier};
 use advent::Day;
@@ -71,15 +72,20 @@ fn run_one(day: Day, check: bool) {
 
     let sol = solver.solve(day, check);
 
-    println!("Parse time: {:?}", sol.parse_duration);
+    let mut table = Table::new();
+    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+
+    table.add_row(row!["Parse", "", format!("{:?}", sol.parse_duration)]);
 
     if let Some((part_1, elapsed)) = sol.part_1 {
-        println!("Part 1: {}\t{:?}", part_1, elapsed);
+        table.add_row(row!["Part 1", part_1, format!("{:?}", elapsed)]);
     }
 
     if let Some((part_2, elapsed)) = sol.part_2 {
-        println!("Part 2: {}\t{:?}", part_2, elapsed);
+        table.add_row(row!["Part 2", part_2, format!("{:?}", elapsed)]);
     }
+    
+    table.printstd();
 }
 
 fn days() -> Vec<&'static dyn Solvifier> {
@@ -97,5 +103,6 @@ fn days() -> Vec<&'static dyn Solvifier> {
         &day11::Day11,
         &day12::Day12,
         &day13::Day13,
+        &day14::Day14,
     ]
 }
