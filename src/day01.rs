@@ -50,4 +50,8 @@ impl Solver for Day01 {
     fn expected(&self) -> (u64, u64) {
         (2756096, 23117829)
     }
+
+    fn name(&self) -> &'static str {
+        "Historian Hysteria (list similarity)"
+    }
 }

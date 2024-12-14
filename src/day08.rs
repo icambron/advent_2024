@@ -94,6 +94,10 @@ impl Solver for Day08 {
     fn expected(&self) -> (u64, u64) {
         (261, 898)
     }
+
+    fn name(&self) -> &'static str {
+        "Resonant Collinearity"
+    }
 }
 
 #[derive(Debug)]

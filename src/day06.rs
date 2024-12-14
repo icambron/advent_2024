@@ -84,6 +84,10 @@ impl Solver for Day06 {
     fn expected(&self) -> (u64, u64) {
         (4696, 1443)
     }
+
+    fn name(&self) -> &'static str {
+        "Guard Gallivant"
+    }
 }
 
 fn part_1(grid: &mut Grid, mut guard: Guard) -> Vec<(Pos, Dir)> {

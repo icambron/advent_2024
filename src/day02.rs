@@ -31,6 +31,10 @@ impl Solver for Day02 {
     fn expected(&self) -> (u64, u64) {
         (332, 398)
     }
+
+    fn name(&self) -> &'static str {
+        "Red-Nosed Reports"
+    }
 }
 
 fn is_report_safe(report: &[i8], exclude_index: Option<usize>) -> bool {

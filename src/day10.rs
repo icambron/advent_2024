@@ -46,6 +46,10 @@ impl Solver for Day10 {
     fn expected(&self) -> (u64, u64) {
         (617, 1477)
     }
+
+    fn name(&self) -> &'static str {
+        "Hoof It (topographic map)"
+    }
 }
 
 fn compute(map: &Map) -> BTreeMap<usize, TrailAgg> {

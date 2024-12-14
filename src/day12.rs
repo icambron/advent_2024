@@ -27,6 +27,10 @@ impl Solver for Day12 {
     fn expected(&self) -> (u64, u64) {
         (1319878, 784982)
     }
+
+    fn name(&self) -> &'static str {
+        "Garden Groups"
+    }
 }
 
 fn solve(map: &Map, count_sides: bool) -> u64 {

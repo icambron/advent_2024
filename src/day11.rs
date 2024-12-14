@@ -23,6 +23,10 @@ impl Solver for Day11 {
     fn expected(&self) -> (u64, u64) {
         (188902, 223894720281135)
     }
+
+    fn name(&self) -> &'static str {
+        "Plutonian Pebbles"
+    }
 }
 
 fn count_stones(stones: &[u64], max_gens: u8, lookup: &mut HashMap<(u64, u8), u64>) -> u64 {

@@ -85,6 +85,10 @@ impl Solver for Day04 {
     fn expected(&self) -> (u64, u64) {
         (2599, 1948)
     }
+
+    fn name(&self) -> &'static str {
+        "Ceres Search (finding XMAS)"
+    }
 }
 
 fn find_all(parsed: &[Vec<char>], target: char) -> Vec<Pos> {

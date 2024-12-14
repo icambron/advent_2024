@@ -85,24 +85,30 @@ impl Input {
     }
 }
 
+pub struct Solution {
+    pub parse_duration: Duration,
+    pub part_1: Option<(u64, Duration)>,
+    pub part_2: Option<(u64, Duration)>,
+    pub name: &'static str
+}
+
 pub trait Solver {
     type Input;
     
     fn parse(&self, input: &str) -> Self::Input;
-    
     fn part_1(&self, input: &mut Self::Input) -> u64;
     fn part_2(&self, input: &mut Self::Input) -> u64;
-
     fn expected(&self) -> (u64, u64);
+    fn name(&self) -> &'static str;
 
 }
 
 pub trait Solvifier {
-    fn solve(&self, day: Day, check: bool) -> (Duration, Option<(u64, Duration)>, Option<(u64, Duration)>);
+    fn solve(&self, day: Day, check: bool) -> Solution;
 }
 
 impl<S> Solvifier for S where S: Solver {
-    fn solve(&self, day: Day, check: bool) -> (Duration, Option<(u64, Duration)>, Option<(u64, Duration)>) {
+    fn solve(&self, day: Day, check: bool) -> Solution {
         let input = load_file(&day.path());
 
         let parse_time = std::time::Instant::now();
@@ -119,8 +125,13 @@ impl<S> Solvifier for S where S: Solver {
                     let expected_1 = self.expected().0;
                     assert_eq!(part_1, expected_1);
                 }
-
-                (parse_elapsed, Some((part_1, elapsed)), None)
+                
+                Solution {
+                    parse_duration: parse_elapsed,
+                    part_1: Some((part_1, elapsed)),
+                    part_2: None,
+                    name: self.name()
+                }
             }
             Part::Two => {
                 let time = std::time::Instant::now();
@@ -131,7 +142,12 @@ impl<S> Solvifier for S where S: Solver {
                     assert_eq!(part_2, expected_2);
                 }
 
-                (parse_elapsed, None, Some((part_2, elapsed)))
+                Solution {
+                    parse_duration: parse_elapsed,
+                    part_1: None,
+                    part_2: Some((part_2, elapsed)),
+                    name: self.name()
+                }
             }
             Part::Both => {
                 let time_1 = std::time::Instant::now();
@@ -148,7 +164,12 @@ impl<S> Solvifier for S where S: Solver {
                     assert_eq!(part_2, expected_2);
                 }
 
-                (parse_elapsed, Some((part_1, elapsed_1)), Some((part_2, elapsed_2)))
+                Solution {
+                    parse_duration: parse_elapsed,
+                    part_1: Some((part_1, elapsed_1)),
+                    part_2: Some((part_2, elapsed_2)),
+                    name: self.name()
+                }
             }
         }
     }

@@ -117,6 +117,10 @@ impl Solver for Day09 {
     fn expected(&self) -> (u64, u64) {
         (6344673854800, 6360363199987)
     }
+
+    fn name(&self) -> &'static str {
+        "Disk Fragmenter"
+    }
 }
 
 fn sum(start: usize, count: usize, id: usize) -> usize {

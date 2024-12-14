@@ -57,6 +57,10 @@ impl Solver for Day05 {
     fn expected(&self) -> (u64, u64) {
         (5948, 3062)
     }
+
+    fn name(&self) -> &'static str {
+        "Print Queue"
+    }
 }
 
 fn is_correct(page_set: &[usize], rules: &HashSet<(usize, usize)>) -> bool {

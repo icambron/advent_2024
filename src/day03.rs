@@ -36,6 +36,10 @@ impl Solver for Day03 {
     fn expected(&self) -> (u64, u64) {
         (189600467, 107069718)
     }
+
+    fn name(&self) -> &'static str {
+        "Mull It Over"
+    }
 }
 
 fn sum_all(ops: &[Op], can_disable: bool) -> u64 {

@@ -45,6 +45,10 @@ impl Solver for Day13 {
     fn expected(&self) -> (u64, u64) {
         (29023, 96787395375634)
     }
+
+    fn name(&self) -> &'static str {
+        "Claw Contraption"
+    }
 }
 
 fn solve<F: Fn(i64) -> i64>(parsed: &[Machine], f: F) -> u64 {
