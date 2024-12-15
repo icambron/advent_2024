@@ -76,15 +76,16 @@ fn run_one(day: Day, check: bool) {
     table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
 
     table.add_row(row!["Parse", "", format!("{:?}", sol.parse_duration)]);
+    table.set_titles(row!["Part", "Result", "Time"]);
 
     if let Some((part_1, elapsed)) = sol.part_1 {
-        table.add_row(row!["Part 1", part_1, format!("{:?}", elapsed)]);
+        table.add_row(row![r -> "1", part_1, format!("{:?}", elapsed)]);
     }
 
     if let Some((part_2, elapsed)) = sol.part_2 {
-        table.add_row(row!["Part 2", part_2, format!("{:?}", elapsed)]);
+        table.add_row(row![r -> "2", part_2, format!("{:?}", elapsed)]);
     }
-    
+
     table.printstd();
 }
 
