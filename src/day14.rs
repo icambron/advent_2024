@@ -47,12 +47,9 @@ impl Solver for Day14 {
     }
     
     fn part_2(&self, input: &mut Self::Input) -> u64 {
-        // the christmas tree has the property that each robot is on its own square
-        // so we check that, then do a harder check in case there were others with this property
-        
         let mut visited = [0; WIDTH as usize * HEIGHT as usize];
         
-        for i in 1..= 10000 {
+        for i in 1..= WIDTH * HEIGHT {
             let mut found_dupe = false;
             for robot in input.iter_mut() {
                 let (x, y) = robot.tick(1);
@@ -67,7 +64,7 @@ impl Solver for Day14 {
             }
 
             if !found_dupe && hard_check(&visited, i) {
-                return i
+                return i as u64
             }
         }
         0
@@ -82,7 +79,7 @@ impl Solver for Day14 {
     }
 }
 
-fn hard_check(counts: &[u64], expected: u64) -> bool {
+fn hard_check(counts: &[i32], expected: i32) -> bool {
     counts.windows(12).any(|window| window.iter().all(|&b| b == expected))
 }
 
