@@ -70,6 +70,7 @@ impl Part {
     }
 }
 
+#[derive(PartialEq, Eq)]
 pub enum Input {
     Sample,
     Real,
@@ -95,7 +96,7 @@ pub struct Solution {
 pub trait Solver {
     type Input;
 
-    fn parse(&self, input: &str) -> Self::Input;
+    fn parse(&self, input: &str, is_sample: bool) -> Self::Input;
     fn part_1(&self, input: &mut Self::Input) -> String;
     fn part_2(&self, input: &mut Self::Input) -> String;
     fn expected(&self) -> (&'static str, &'static str);
@@ -114,7 +115,7 @@ where
         let input = load_file(&day.path());
 
         let parse_time = std::time::Instant::now();
-        let mut input = self.parse(&input);
+        let mut input = self.parse(&input, day.input == Input::Sample);
         let parse_elapsed = parse_time.elapsed();
 
         match day.part {

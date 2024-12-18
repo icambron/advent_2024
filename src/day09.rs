@@ -5,7 +5,7 @@ pub struct Day09;
 impl Solver for Day09 {
     type Input = (Vec<Block>, Vec<Slot>);
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut chars = input.chars();
         let mut id = 0;
         let mut index = 0;

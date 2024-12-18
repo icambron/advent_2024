@@ -5,7 +5,7 @@ pub struct Day06;
 impl Solver for Day06 {
     type Input = (Grid, Guard);
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut map = Vec::new();
         let mut guard = None;
         let mut height = 0;

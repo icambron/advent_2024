@@ -5,7 +5,7 @@ pub struct Day13;
 impl Solver for Day13 {
     type Input = Vec<Machine>;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut machines = Vec::new();
         let mut lines = input.lines().filter(|line| !line.trim().is_empty());
 

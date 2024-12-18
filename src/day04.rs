@@ -4,7 +4,7 @@ pub struct Day04;
 impl Solver for Day04 {
     type Input = Vec<Vec<char>>;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut parsed = Vec::new();
         for line in input.lines() {
             let row: Vec<char> = line.chars().collect();

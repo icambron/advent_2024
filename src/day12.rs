@@ -5,7 +5,7 @@ pub struct Day12;
 impl Solver for Day12 {
     type Input = Map;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let lines: Vec<&str> = input.lines().collect();
         let width = lines.first().map_or(0, |line| line.len());
         let chars: Vec<char> = lines.concat().chars().collect();

@@ -7,7 +7,7 @@ pub struct Day08;
 impl Solver for Day08 {
     type Input = Parsed;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut height = 0;
         let mut width = 0;
         let mut antennas = Vec::new();

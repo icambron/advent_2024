@@ -6,7 +6,7 @@ pub struct Day03;
 impl Solver for Day03 {
     type Input = Vec<Op>;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let re = Regex::new(r"(mul\((\d+),(\d+)\)|do\(\)|don't\(\))").unwrap();
         re.captures_iter(input)
             .map(|cap| match cap.get(1) {

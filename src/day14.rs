@@ -1,21 +1,14 @@
 use crate::advent::Solver;
 use regex::Regex;
 
-// sample sizes
-// const WIDTH: i32 = 11;
-// const HEIGHT: i32 = 7;
-
-const WIDTH: i32 = 101;
-const HEIGHT: i32 = 103;
-
 pub struct Day14;
 
 impl Solver for Day14 {
-    type Input = Vec<Robot>;
+    type Input = Grid;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, is_sample: bool) -> Self::Input {
         let regex = Regex::new(r"p=(\d+),(\d+) v=(-?\d+),(-?\d+)").unwrap();
-        input
+        let robots = input
             .lines()
             .map(|l| {
                 let caps = regex.captures(l).unwrap();
@@ -24,21 +17,27 @@ impl Solver for Day14 {
                     velocity: (caps[3].parse().unwrap(), caps[4].parse().unwrap()),
                 }
             })
-            .collect()
+            .collect();
+        
+        Grid {
+            width: if is_sample { 11 } else { 101 },
+            height: if is_sample { 7 } else { 103 },
+            robots
+        }
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> String {
+    fn part_1(&self, grid: &mut Self::Input) -> String {
         let mut quadrants: [u64; 4] = [0, 0, 0, 0];
 
-        for robot in input {
-            let (x, y) = tick_robot(robot, 100);
+        for robot in &grid.robots {
+            let (x, y) = tick_robot(robot, 100, grid.width, grid.height);
 
-            if x == WIDTH / 2 || y == HEIGHT / 2 {
+            if x == grid.width / 2 || y == grid.height / 2 {
                 continue;
             }
 
-            let is_left = x < WIDTH / 2;
-            let is_top = y < HEIGHT / 2;
+            let is_left = x < grid.width / 2;
+            let is_top = y < grid.height / 2;
             let quadrant = (is_top as usize) * 2 + is_left as usize;
 
             quadrants[quadrant] += 1;
@@ -47,16 +46,16 @@ impl Solver for Day14 {
         quadrants.iter().product::<u64>().to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> String {
-        let mut visited = [0; WIDTH as usize * HEIGHT as usize];
+    fn part_2(&self, grid: &mut Self::Input) -> String {
+        let mut visited = vec![0; grid.width as usize * grid.height as usize];
 
-        for i in 1..=WIDTH * HEIGHT {
+        for i in 1..=grid.width * grid.height {
             let mut found_dupe = false;
-            for robot in input.iter_mut() {
-                let (x, y) = robot.tick(1);
+            for robot in grid.robots.iter_mut() {
+                let (x, y) = robot.tick(1, grid.width, grid.height);
 
                 if !found_dupe {
-                    let j = visited.get_mut((y * WIDTH + x) as usize).unwrap();
+                    let j = visited.get_mut((y * grid.width + x) as usize).unwrap();
                     if *j == i {
                         found_dupe = true;
                     }
@@ -84,60 +83,37 @@ fn hard_check(counts: &[i32], expected: i32) -> bool {
     counts.windows(12).any(|window| window.iter().all(|&b| b == expected))
 }
 
-fn tick_robot(robot: &Robot, seconds: i32) -> (i32, i32) {
-    let mut x = (robot.pos.0 + robot.velocity.0 * seconds) % WIDTH;
-    let mut y = (robot.pos.1 + robot.velocity.1 * seconds) % HEIGHT;
+fn tick_robot(robot: &Robot, seconds: i32, width: i32, height: i32) -> (i32, i32) {
+    let mut x = (robot.pos.0 + robot.velocity.0 * seconds) % width;
+    let mut y = (robot.pos.1 + robot.velocity.1 * seconds) % height;
 
     if x < 0 {
-        x += WIDTH;
+        x += width;
     }
 
     if y < 0 {
-        y += HEIGHT;
+        y += height;
     }
 
     (x, y)
 }
 
-#[allow(dead_code)]
-fn print_frame(i: u64, robots: &[Robot]) {
-    println!("SECONDS: {}", i);
-    println!("{}", stringify_robots(robots));
-    println!();
-    println!();
-}
-
-fn stringify_robots(robots: &[Robot]) -> String {
-    let mut grid: Vec<Vec<u8>> = vec![vec![0; WIDTH as usize]; HEIGHT as usize];
-    for robot in robots {
-        grid[robot.pos.1 as usize][robot.pos.0 as usize] += 1;
-    }
-
-    let mut s = String::new();
-    for row in grid {
-        for cell in row {
-            if cell > 0 {
-                s.push((cell + b'0') as char)
-            } else {
-                s.push('.');
-            }
-        }
-        s.push('\n');
-    }
-
-    s
-}
-
 #[derive(Debug)]
-pub struct Robot {
+struct Robot {
     pos: (i32, i32),
     velocity: (i32, i32),
 }
 
 impl Robot {
-    fn tick(&mut self, seconds: i32) -> (i32, i32) {
-        let (x, y) = tick_robot(self, seconds);
+    fn tick(&mut self, seconds: i32, width: i32, height: i32) -> (i32, i32) {
+        let (x, y) = tick_robot(self, seconds, width, height);
         self.pos = (x, y);
         (x, y)
     }
+}
+
+pub struct Grid {
+    width: i32,
+    height: i32,
+    robots: Vec<Robot>,
 }

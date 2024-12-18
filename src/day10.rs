@@ -6,7 +6,7 @@ pub struct Day10;
 impl Solver for Day10 {
     type Input = Map;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut map = CharMap::new();
         let mut width = 0;
         let mut first_row = true;

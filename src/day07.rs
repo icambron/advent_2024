@@ -4,7 +4,7 @@ pub struct Day07;
 impl Solver for Day07 {
     type Input = Vec<Equation>;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         input
             .lines()
             .map(|line| {

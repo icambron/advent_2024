@@ -9,7 +9,7 @@ pub struct Day17;
 impl Solver for Day17 {
     type Input = Computer;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let split: Vec<&str> = input.split("\n\n").collect();
         let [reg_text, ins_txt] = split[0..2] else { panic!("Can't parse") };
 

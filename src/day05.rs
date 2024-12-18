@@ -5,7 +5,7 @@ pub struct Day05;
 impl Solver for Day05 {
     type Input = Update;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut rules = HashSet::new();
         let mut pages = Vec::new();
         for line in input.lines() {

@@ -9,7 +9,7 @@ pub struct Day16;
 impl Solver for Day16 {
     type Input = Maze;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut start = None;
 
         let width = input.find('\n').unwrap();

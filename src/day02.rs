@@ -5,7 +5,7 @@ pub struct Day02;
 impl Solver for Day02 {
     type Input = Vec<Vec<i8>>;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut reports = Vec::with_capacity(1000);
         for line in input.lines() {
             let levels: Vec<i8> = line

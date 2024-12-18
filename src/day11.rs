@@ -6,7 +6,7 @@ pub struct Day11;
 impl Solver for Day11 {
     type Input = Vec<u64>;
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         input.split_whitespace().map(|s| s.parse().unwrap()).collect()
     }
 

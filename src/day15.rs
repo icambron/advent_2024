@@ -7,7 +7,7 @@ pub struct Day15;
 impl Solver for Day15 {
     type Input = (Map, Vec<char>);
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let split: Vec<&str> = input.split("\n\n").collect();
         let [map_txt, dir_txt] = split[0..2] else { panic!("Can't parse") };
 

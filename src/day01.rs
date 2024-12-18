@@ -6,7 +6,7 @@ pub struct Day01;
 impl Solver for Day01 {
     type Input = (Vec<i32>, Vec<i32>);
 
-    fn parse(&self, input: &str) -> Self::Input {
+    fn parse(&self, input: &str, _: bool) -> Self::Input {
         let mut list_a = Vec::with_capacity(1000);
         let mut list_b = Vec::with_capacity(1000);
 
