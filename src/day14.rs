@@ -26,7 +26,7 @@ impl Solver for Day14 {
 
     fn part_1(&self, input: &mut Self::Input) -> String {
         
-        let mut quadrants: [u16; 4] = [0, 0, 0, 0];
+        let mut quadrants: [u64; 4] = [0, 0, 0, 0];
         
         for robot in input {
             
@@ -43,7 +43,7 @@ impl Solver for Day14 {
             quadrants[quadrant] += 1;
         }
 
-        quadrants.iter().fold(1, |acc, &q| acc * q).to_string()
+        quadrants.iter().product::<u64>().to_string()
     }
     
     fn part_2(&self, input: &mut Self::Input) -> String {

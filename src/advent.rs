@@ -123,7 +123,7 @@ impl<S> Solvifier for S where S: Solver {
                 let elapsed = time.elapsed();
                 if check {
                     let expected_1 = self.expected().0;
-                    assert_eq!(part_1, expected_1);
+                    assert_eq!(part_1, expected_1, "Part 1 of day {} failed", day.number);
                 }
                 
                 Solution {
@@ -139,7 +139,7 @@ impl<S> Solvifier for S where S: Solver {
                 let elapsed = time.elapsed();
                 if check {
                     let expected_2 = self.expected().1;
-                    assert_eq!(part_2, expected_2);
+                    assert_eq!(part_2, expected_2, "Part 2 of day {} failed", day.number);
                 }
 
                 Solution {
@@ -160,8 +160,8 @@ impl<S> Solvifier for S where S: Solver {
 
                 if check {
                     let (expected_1, expected_2) = self.expected();
-                    assert_eq!(part_1, expected_1);
-                    assert_eq!(part_2, expected_2);
+                    assert_eq!(part_1, expected_1, "Part 1 of day {} failed", day.number);
+                    assert_eq!(part_2, expected_2, "Part 2 of day {} failed", day.number);
                 }
 
                 Solution {
