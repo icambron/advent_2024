@@ -87,8 +87,8 @@ impl Input {
 
 pub struct Solution {
     pub parse_duration: Duration,
-    pub part_1: Option<(u64, Duration)>,
-    pub part_2: Option<(u64, Duration)>,
+    pub part_1: Option<(String, Duration)>,
+    pub part_2: Option<(String, Duration)>,
     pub name: &'static str
 }
 
@@ -96,9 +96,9 @@ pub trait Solver {
     type Input;
     
     fn parse(&self, input: &str) -> Self::Input;
-    fn part_1(&self, input: &mut Self::Input) -> u64;
-    fn part_2(&self, input: &mut Self::Input) -> u64;
-    fn expected(&self) -> (u64, u64);
+    fn part_1(&self, input: &mut Self::Input) -> String;
+    fn part_2(&self, input: &mut Self::Input) -> String;
+    fn expected(&self) -> (&'static str, &'static str);
     fn name(&self) -> &'static str;
 
 }

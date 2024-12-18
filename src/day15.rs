@@ -33,18 +33,18 @@ impl Solver for Day15 {
         (Map { squares: map, width, robot_location }, dirs)
     }
 
-    fn part_1(&self, (map, dirs): &mut Self::Input) -> u64 {
+    fn part_1(&self, (map, dirs): &mut Self::Input) -> String {
         let mut map = map.clone();
-        solve(&mut map, dirs)
+        solve(&mut map, dirs).to_string()
     }
     
-    fn part_2(&self, (smol_map, dirs): &mut Self::Input) -> u64 {
+    fn part_2(&self, (smol_map, dirs): &mut Self::Input) -> String {
         let mut map = embiggen_squares(smol_map);
-        solve(&mut map, dirs)
+        solve(&mut map, dirs).to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (1442192, 1448458)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("1442192", "1448458")
     }
 
     fn name(&self) -> &'static str {

@@ -14,7 +14,7 @@ impl Solver for Day04 {
         parsed
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
+    fn part_1(&self, input: &mut Self::Input) -> String {
         let xs: Vec<Pos> = find_all(input, 'X');
         const MAS: &str = "MAS";
 
@@ -51,10 +51,10 @@ impl Solver for Day04 {
             }
         }
 
-        xmases as u64
+        xmases.to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
+    fn part_2(&self, input: &mut Self::Input) -> String {
         fn is_mas(parsed: &[Vec<char>], tuple: (Option<Pos>, Option<Pos>)) -> bool {
             if let (Some(first), Some(second)) = tuple {
                 if let (Some(c1), Some(c2)) = (first.char_at(parsed), second.char_at(parsed)) {
@@ -79,11 +79,11 @@ impl Solver for Day04 {
             })
             .count();
 
-        xmases as u64
+        xmases.to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (2599, 1948)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("2599", "1948")
     }
 
     fn name(&self) -> &'static str {

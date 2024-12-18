@@ -42,7 +42,7 @@ impl Solver for Day09 {
         (blocks, slots)
     }
 
-    fn part_1(&self, (_, slots): &mut Self::Input) -> u64 {
+    fn part_1(&self, (_, slots): &mut Self::Input) -> String {
         let mut reversed = slots.iter().rev().enumerate().filter(|(_, slot)| matches!(slot, Slot::File(_)));
 
         let mut checksum = 0;
@@ -70,10 +70,10 @@ impl Solver for Day09 {
             }
         }
 
-        checksum as u64
+        checksum.to_string()
     }
 
-    fn part_2(&self, (blocks, _) : &mut Self::Input) -> u64 {
+    fn part_2(&self, (blocks, _) : &mut Self::Input) -> String {
         let mut free: Vec<Block> = blocks.iter().filter(|b| matches!(b.slot, Slot::Empty)).cloned().collect();
         let mut offsets: [usize; 9] = [0; 9];
 
@@ -111,11 +111,11 @@ impl Solver for Day09 {
             }
         }
 
-        total as u64
+        total.to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (6344673854800, 6360363199987)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("6344673854800", "6360363199987")
     }
 
     fn name(&self) -> &'static str {

@@ -25,16 +25,16 @@ impl Solver for Day03 {
             .collect()
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
-        sum_all(input, false)
+    fn part_1(&self, input: &mut Self::Input) -> String {
+        sum_all(input, false).to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
-        sum_all(input, true)
+    fn part_2(&self, input: &mut Self::Input) -> String {
+        sum_all(input, true).to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (189600467, 107069718)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("189600467", "107069718")
     }
 
     fn name(&self) -> &'static str {

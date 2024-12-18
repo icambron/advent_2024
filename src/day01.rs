@@ -29,11 +29,12 @@ impl Solver for Day01 {
         (list_a, list_b)
     }
 
-    fn part_1(&self, (list_a, list_b): &mut Self::Input) -> u64 {
-        list_a.iter().zip(list_b.iter()).fold(0, |sum, (a, b)| sum + (b - a).unsigned_abs()) as u64
+    fn part_1(&self, (list_a, list_b): &mut Self::Input) -> String {
+        let r = list_a.iter().zip(list_b.iter()).fold(0, |sum, (a, b)| sum + (b - a).unsigned_abs());
+        r.to_string()
     }
 
-    fn part_2(&self, (list_a, list_b): &mut Self::Input) -> u64 {
+    fn part_2(&self, (list_a, list_b): &mut Self::Input) -> String {
         let mut hash = BTreeMap::new();
         for n in list_b.iter() {
             hash.entry(n).and_modify(|e| *e += 1).or_insert(1);
@@ -44,11 +45,11 @@ impl Solver for Day01 {
             sum + similarity * val
         });
 
-        sum_similarity as u64
+        sum_similarity.to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (2756096, 23117829)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("2756096", "23117829")
     }
 
     fn name(&self) -> &'static str {

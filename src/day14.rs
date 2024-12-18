@@ -24,7 +24,7 @@ impl Solver for Day14 {
         }).collect()
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
+    fn part_1(&self, input: &mut Self::Input) -> String {
         
         let mut quadrants: [u16; 4] = [0, 0, 0, 0];
         
@@ -43,10 +43,10 @@ impl Solver for Day14 {
             quadrants[quadrant] += 1;
         }
 
-        quadrants.iter().fold(1, |acc, &q| acc * q as u64)
+        quadrants.iter().fold(1, |acc, &q| acc * q).to_string()
     }
     
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
+    fn part_2(&self, input: &mut Self::Input) -> String {
         let mut visited = [0; WIDTH as usize * HEIGHT as usize];
         
         for i in 1..= WIDTH * HEIGHT {
@@ -64,14 +64,14 @@ impl Solver for Day14 {
             }
 
             if !found_dupe && hard_check(&visited, i) {
-                return i as u64
+                return i.to_string()
             }
         }
-        0
+        "0".to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (214109808, 7687)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("214109808", "7687")
     }
 
     fn name(&self) -> &'static str {

@@ -33,18 +33,18 @@ impl Solver for Day10 {
         Map { chars: map, width, size }
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
+    fn part_1(&self, input: &mut Self::Input) -> String {
         let progress = compute(input);
-        progress.values().fold(0, |nines, agg| nines + agg.zeros.len() as u64)
+        progress.values().fold(0, |nines, agg| nines + agg.zeros.len()).to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
+    fn part_2(&self, input: &mut Self::Input) -> String {
         let progress = compute(input);
-        progress.values().fold(0, |distinct, agg| distinct + agg.perm)
+        progress.values().fold(0, |distinct, agg| distinct + agg.perm).to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (617, 1477)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("617", "1477")
     }
 
     fn name(&self) -> &'static str {

@@ -24,16 +24,16 @@ impl Solver for Day05 {
         Update { rules, pages }
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
+    fn part_1(&self, input: &mut Self::Input) -> String {
         input
             .pages
             .iter()
             .filter(|page_set| is_correct(page_set, &input.rules))
             .map(|page_set| middle_page(page_set))
-            .sum::<usize>() as u64
+            .sum::<usize>().to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
+    fn part_2(&self, input: &mut Self::Input) -> String {
         input
             .pages
             .iter_mut()
@@ -51,11 +51,11 @@ impl Solver for Day05 {
 
                 middle_page(&page_set)
             })
-            .sum::<usize>() as u64
+            .sum::<usize>().to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (5948, 3062)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("5948", "3062")
     }
 
     fn name(&self) -> &'static str {

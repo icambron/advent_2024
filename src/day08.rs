@@ -35,7 +35,7 @@ impl Solver for Day08 {
         Parsed { antennas, width, height }
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
+    fn part_1(&self, input: &mut Self::Input) -> String {
         let mut antinode_map = vec![false; input.width * input.height];
         for (_, antennas) in input.antennas.iter() {
             for pair in antennas.iter().combinations(2) {
@@ -54,10 +54,10 @@ impl Solver for Day08 {
             }
         }
 
-        antinode_map.iter().filter(|&a| *a).count() as u64
+        antinode_map.iter().filter(|&a| *a).count().to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
+    fn part_2(&self, input: &mut Self::Input) -> String {
         let formulas: Vec<Resonation> = input
             .antennas
             .iter()
@@ -88,11 +88,11 @@ impl Solver for Day08 {
             }
         }
 
-        count
+        count.to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (261, 898)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("261", "898")
     }
 
     fn name(&self) -> &'static str {

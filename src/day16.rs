@@ -27,16 +27,16 @@ impl Solver for Day16 {
         Maze { start: start.unwrap(), map, width }
     }
 
-    fn part_1(&self, maze: &mut Self::Input) -> u64 {
-        solve(maze, false).0
+    fn part_1(&self, maze: &mut Self::Input) -> String {
+        solve(maze, false).0.to_string()
     }
 
-    fn part_2(&self, maze: &mut Self::Input) -> u64 {
-        solve(maze, true).1 as u64
+    fn part_2(&self, maze: &mut Self::Input) -> String {
+        solve(maze, true).1.to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (85432, 465)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("85432", "465")
     }
 
     fn name(&self) -> &'static str {

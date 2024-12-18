@@ -15,6 +15,7 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 
 use crate::advent::{Advent, Solution, Solvifier};
 use advent::Day;
@@ -46,7 +47,7 @@ fn run_all(check: bool) {
 
     let total: Duration = times
         .values()
-        .map(|sol| sol.parse_duration + sol.part_1.unwrap().1 + sol.part_2.unwrap().1)
+        .map(|sol| sol.parse_duration + sol.part_1.as_ref().unwrap().1 + sol.part_2.as_ref().unwrap().1)
         .sum();
 
     let mut table = Table::new();
@@ -54,13 +55,17 @@ fn run_all(check: bool) {
     table.set_titles(row!["Day", "Name", "Parse (µs)", "Part 1 (µs)", "Part 2 (µs)", "Total (µs)"]);
 
     for (day, sol) in times {
+        
+        let part_1 = sol.part_1.unwrap().1;
+        let part_2 = sol.part_2.unwrap().1;
+        
         table.add_row(row![
             r -> day,
             l -> sol.name,
             r -> sol.parse_duration.as_micros(),
-            r -> sol.part_1.unwrap().1.as_micros(),
-            r -> sol.part_2.unwrap().1.as_micros(),
-            r -> sol.parse_duration.as_micros() + sol.part_1.unwrap().1.as_micros() + sol.part_2.unwrap().1.as_micros()
+            r -> part_1.as_micros(),
+            r -> part_2.as_micros(),
+            r -> sol.parse_duration.as_micros() + part_1.as_micros() + part_2.as_micros()
         ]);
     }
 
@@ -109,5 +114,6 @@ fn days() -> Vec<&'static dyn Solvifier> {
         &day14::Day14,
         &day15::Day15,
         &day16::Day16,
+        &day17::Day17,
     ]
 }

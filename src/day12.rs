@@ -16,16 +16,16 @@ impl Solver for Day12 {
         }
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
-        solve(input, false)
+    fn part_1(&self, input: &mut Self::Input) -> String {
+        solve(input, false).to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
-        solve(input, true)
+    fn part_2(&self, input: &mut Self::Input) -> String {
+        solve(input, true).to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (1319878, 784982)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("1319878", "784982")
     }
 
     fn name(&self) -> &'static str {

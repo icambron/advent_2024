@@ -16,16 +16,16 @@ impl Solver for Day07 {
             .collect()
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
-        try_combos(input, &[Op::Add, Op::Mul])
+    fn part_1(&self, input: &mut Self::Input) -> String {
+        try_combos(input, &[Op::Add, Op::Mul]).to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
-        try_combos(input, &[Op::Add, Op::Mul, Op::Concat])
+    fn part_2(&self, input: &mut Self::Input) -> String {
+        try_combos(input, &[Op::Add, Op::Mul, Op::Concat]).to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (21572148763543, 581941094529163)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("21572148763543", "581941094529163")
     }
 
     fn name(&self) -> &'static str {

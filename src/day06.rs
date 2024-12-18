@@ -39,12 +39,12 @@ impl Solver for Day06 {
         }
     }
 
-    fn part_1(&self, (grid, guard): &mut Self::Input) -> u64 {
+    fn part_1(&self, (grid, guard): &mut Self::Input) -> String {
         let candidate_pos = part_1(grid, guard.clone());
-        (candidate_pos.len() + 1) as u64
+        (candidate_pos.len() + 1).to_string()
     }
 
-    fn part_2(&self, (grid, guard): &mut Self::Input) -> u64 {
+    fn part_2(&self, (grid, guard): &mut Self::Input) -> String {
         let candidate_pos = part_1(grid, guard.clone());
 
         let mut obstacles_that_worked = 0;
@@ -78,11 +78,11 @@ impl Solver for Day06 {
             last_dir = dir;
         }
 
-        obstacles_that_worked
+        obstacles_that_worked.to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (4696, 1443)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("4696", "1443")
     }
 
     fn name(&self) -> &'static str {

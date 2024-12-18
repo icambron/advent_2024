@@ -10,18 +10,18 @@ impl Solver for Day11 {
         input.split_whitespace().map(|s| s.parse().unwrap()).collect()
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
+    fn part_1(&self, input: &mut Self::Input) -> String {
         let mut lookup = HashMap::with_capacity(140_000);
-        count_stones(input, 25, &mut lookup)
+        count_stones(input, 25, &mut lookup).to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
+    fn part_2(&self, input: &mut Self::Input) -> String {
         let mut lookup = HashMap::with_capacity(140_000);
-        count_stones(input, 75, &mut lookup)
+        count_stones(input, 75, &mut lookup).to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (188902, 223894720281135)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("188902", "223894720281135")
     }
 
     fn name(&self) -> &'static str {

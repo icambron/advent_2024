@@ -34,16 +34,16 @@ impl Solver for Day13 {
         machines
     }
 
-    fn part_1(&self, input: &mut Self::Input) -> u64 {
-        solve(input, |prize| prize)
+    fn part_1(&self, input: &mut Self::Input) -> String {
+        solve(input, |prize| prize).to_string()
     }
 
-    fn part_2(&self, input: &mut Self::Input) -> u64 {
-        solve(input, |prize| prize + 10000000000000)
+    fn part_2(&self, input: &mut Self::Input) -> String {
+        solve(input, |prize| prize + 10000000000000).to_string()
     }
 
-    fn expected(&self) -> (u64, u64) {
-        (29023, 96787395375634)
+    fn expected(&self) -> (&'static str, &'static str) {
+        ("29023", "96787395375634")
     }
 
     fn name(&self) -> &'static str {
