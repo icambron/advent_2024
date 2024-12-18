@@ -18,11 +18,11 @@ impl Solver for Day14 {
                 }
             })
             .collect();
-        
+
         Grid {
             width: if is_sample { 11 } else { 101 },
             height: if is_sample { 7 } else { 103 },
-            robots
+            robots,
         }
     }
 
