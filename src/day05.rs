@@ -30,7 +30,8 @@ impl Solver for Day05 {
             .iter()
             .filter(|page_set| is_correct(page_set, &input.rules))
             .map(|page_set| middle_page(page_set))
-            .sum::<usize>().to_string()
+            .sum::<usize>()
+            .to_string()
     }
 
     fn part_2(&self, input: &mut Self::Input) -> String {
@@ -51,7 +52,8 @@ impl Solver for Day05 {
 
                 middle_page(&page_set)
             })
-            .sum::<usize>().to_string()
+            .sum::<usize>()
+            .to_string()
     }
 
     fn expected(&self) -> (&'static str, &'static str) {

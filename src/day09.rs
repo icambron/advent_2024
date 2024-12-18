@@ -73,7 +73,7 @@ impl Solver for Day09 {
         checksum.to_string()
     }
 
-    fn part_2(&self, (blocks, _) : &mut Self::Input) -> String {
+    fn part_2(&self, (blocks, _): &mut Self::Input) -> String {
         let mut free: Vec<Block> = blocks.iter().filter(|b| matches!(b.slot, Slot::Empty)).cloned().collect();
         let mut offsets: [usize; 9] = [0; 9];
 

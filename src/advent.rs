@@ -89,32 +89,33 @@ pub struct Solution {
     pub parse_duration: Duration,
     pub part_1: Option<(String, Duration)>,
     pub part_2: Option<(String, Duration)>,
-    pub name: &'static str
+    pub name: &'static str,
 }
 
 pub trait Solver {
     type Input;
-    
+
     fn parse(&self, input: &str) -> Self::Input;
     fn part_1(&self, input: &mut Self::Input) -> String;
     fn part_2(&self, input: &mut Self::Input) -> String;
     fn expected(&self) -> (&'static str, &'static str);
     fn name(&self) -> &'static str;
-
 }
 
 pub trait Solvifier {
     fn solve(&self, day: Day, check: bool) -> Solution;
 }
 
-impl<S> Solvifier for S where S: Solver {
+impl<S> Solvifier for S
+where
+    S: Solver,
+{
     fn solve(&self, day: Day, check: bool) -> Solution {
         let input = load_file(&day.path());
 
         let parse_time = std::time::Instant::now();
         let mut input = self.parse(&input);
         let parse_elapsed = parse_time.elapsed();
-
 
         match day.part {
             Part::One => {
@@ -125,12 +126,12 @@ impl<S> Solvifier for S where S: Solver {
                     let expected_1 = self.expected().0;
                     assert_eq!(part_1, expected_1, "Part 1 of day {} failed", day.number);
                 }
-                
+
                 Solution {
                     parse_duration: parse_elapsed,
                     part_1: Some((part_1, elapsed)),
                     part_2: None,
-                    name: self.name()
+                    name: self.name(),
                 }
             }
             Part::Two => {
@@ -146,7 +147,7 @@ impl<S> Solvifier for S where S: Solver {
                     parse_duration: parse_elapsed,
                     part_1: None,
                     part_2: Some((part_2, elapsed)),
-                    name: self.name()
+                    name: self.name(),
                 }
             }
             Part::Both => {
@@ -168,7 +169,7 @@ impl<S> Solvifier for S where S: Solver {
                     parse_duration: parse_elapsed,
                     part_1: Some((part_1, elapsed_1)),
                     part_2: Some((part_2, elapsed_2)),
-                    name: self.name()
+                    name: self.name(),
                 }
             }
         }

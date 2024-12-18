@@ -13,8 +13,9 @@ impl Solver for Day16 {
         let mut start = None;
 
         let width = input.find('\n').unwrap();
-        let map = input.chars()
-            .filter(|c | *c != '\n')
+        let map = input
+            .chars()
+            .filter(|c| *c != '\n')
             .enumerate()
             .map(|(i, c)| {
                 if c == 'S' {
@@ -23,8 +24,12 @@ impl Solver for Day16 {
                 c
             })
             .collect();
-        
-        Maze { start: start.unwrap(), map, width }
+
+        Maze {
+            start: start.unwrap(),
+            map,
+            width,
+        }
     }
 
     fn part_1(&self, maze: &mut Self::Input) -> String {
@@ -49,16 +54,15 @@ pub fn solve(maze: &Maze, multiple: bool) -> (u64, usize) {
         coord: maze.start,
         dir: Dir::East,
         prev: None,
-        cost: 0
+        cost: 0,
     };
 
     let mut queue: BinaryHeap<Step> = BinaryHeap::from([initial_step]);
     let mut visited: Vec<[Option<(usize, u64)>; 4]> = vec![[None; 4]; maze.map.len()];
-    
-    let mut found : Option<(usize, u64)> = None;
+
+    let mut found: Option<(usize, u64)> = None;
 
     while let Some(step) = queue.pop() {
-        
         if let Some((_, found_cost)) = found {
             if step.cost >= found_cost {
                 continue;
@@ -75,14 +79,13 @@ pub fn solve(maze: &Maze, multiple: bool) -> (u64, usize) {
         let c = maze.map.get(step.coord).unwrap();
 
         match c {
-
             'E' => {
                 if multiple {
                     found = Some((step.coord, step.cost));
                 } else {
-                    return (step.cost, 0)
+                    return (step.cost, 0);
                 }
-            },
+            }
 
             '#' => {
                 continue;
@@ -94,7 +97,7 @@ pub fn solve(maze: &Maze, multiple: bool) -> (u64, usize) {
                         coord: maze.next(step.coord, &dir),
                         dir,
                         cost: step.cost + 1001,
-                        prev: Some(step.coord)
+                        prev: Some(step.coord),
                     });
                 }
 
@@ -102,11 +105,11 @@ pub fn solve(maze: &Maze, multiple: bool) -> (u64, usize) {
                     coord: maze.next(step.coord, &step.dir),
                     dir: step.dir,
                     cost: step.cost + 1,
-                    prev: Some(step.coord)
+                    prev: Some(step.coord),
                 });
             }
 
-            _ => panic!("Unexpected character: {}", c)
+            _ => panic!("Unexpected character: {}", c),
         }
     }
 
@@ -121,16 +124,17 @@ pub fn solve(maze: &Maze, multiple: bool) -> (u64, usize) {
                     let v = visited.get(prev_coord).unwrap();
                     for (dir_index, val) in v.iter().enumerate() {
                         if let Some((p, s)) = val {
-                            
-                            let diff_required = match  prev_dir {
-                                Some(prev_dir) => if prev_dir == dir_index {
-                                    0
-                                } else {
-                                    1000
-                                },
-                                None => 0
+                            let diff_required = match prev_dir {
+                                Some(prev_dir) => {
+                                    if prev_dir == dir_index {
+                                        0
+                                    } else {
+                                        1000
+                                    }
+                                }
+                                None => 0,
                             };
-                            
+
                             if *s < prev_score - diff_required {
                                 queue.push((*p, *s, Some(dir_index)));
                             }
@@ -138,11 +142,11 @@ pub fn solve(maze: &Maze, multiple: bool) -> (u64, usize) {
                     }
                 }
             }
-            
+
             return (score, nodes);
         }
 
-        (0, 0) 
+        (0, 0)
     } else {
         (0, 0)
     }
@@ -152,7 +156,7 @@ pub fn solve(maze: &Maze, multiple: bool) -> (u64, usize) {
 pub struct Maze {
     start: usize,
     width: usize,
-    map: Vec<char>
+    map: Vec<char>,
 }
 
 impl Maze {
@@ -184,9 +188,9 @@ impl Maze {
 #[derive(Debug, Eq)]
 struct Step {
     coord: usize,
-    dir:  Dir,
+    dir: Dir,
     cost: u64,
-    prev: Option<usize>
+    prev: Option<usize>,
 }
 
 impl PartialEq for Step {
@@ -212,7 +216,7 @@ enum Dir {
     North,
     South,
     East,
-    West
+    West,
 }
 
 impl Dir {
@@ -224,8 +228,8 @@ impl Dir {
             Dir::West => [Dir::South, Dir::North],
         }
     }
-    
-    fn index (&self) -> usize {
+
+    fn index(&self) -> usize {
         match self {
             Dir::North => 0,
             Dir::South => 1,
@@ -234,4 +238,3 @@ impl Dir {
         }
     }
 }
-

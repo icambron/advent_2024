@@ -55,10 +55,9 @@ fn run_all(check: bool) {
     table.set_titles(row!["Day", "Name", "Parse (µs)", "Part 1 (µs)", "Part 2 (µs)", "Total (µs)"]);
 
     for (day, sol) in times {
-        
         let part_1 = sol.part_1.unwrap().1;
         let part_2 = sol.part_2.unwrap().1;
-        
+
         table.add_row(row![
             r -> day,
             l -> sol.name,

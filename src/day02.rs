@@ -25,7 +25,8 @@ impl Solver for Day02 {
         input
             .iter()
             .filter(|report| report.iter().enumerate().any(|(i, _)| is_report_safe(report, Some(i))))
-            .count().to_string()
+            .count()
+            .to_string()
     }
 
     fn expected(&self) -> (&'static str, &'static str) {

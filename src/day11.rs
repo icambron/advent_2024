@@ -85,4 +85,3 @@ fn split_in_two(num: u64) -> Option<(u64, u64)> {
 
     Some((high, low))
 }
-

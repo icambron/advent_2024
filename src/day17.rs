@@ -1,8 +1,8 @@
+use crate::advent::Solver;
+use itertools::Itertools;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::ops::{Shl, Shr, ShrAssign};
-use itertools::Itertools;
-use crate::advent::{Solver};
 
 pub struct Day17;
 
@@ -45,7 +45,10 @@ impl Solver for Day17 {
                         return a.to_string();
                     }
 
-                    solutions.push(Sol { a, iteration: sol.iteration + 1 });
+                    solutions.push(Sol {
+                        a,
+                        iteration: sol.iteration + 1,
+                    });
                 }
             }
         }
@@ -64,7 +67,7 @@ impl Solver for Day17 {
 #[derive(Debug, PartialEq, Eq)]
 struct Sol {
     a: u64,
-    iteration: usize
+    iteration: usize,
 }
 
 impl PartialOrd<Self> for Sol {
@@ -80,9 +83,7 @@ impl Ord for Sol {
 }
 
 fn parse_instructions(txt: &str) -> (Vec<Instruction>, Vec<u64>) {
-    let mut ins = txt.chars()
-        .filter(|c| *c != ',');
-
+    let mut ins = txt.chars().filter(|c| *c != ',');
 
     let mut instructions = vec![];
     let mut instructions_raw = vec![];
@@ -101,7 +102,7 @@ fn parse_instructions(txt: &str) -> (Vec<Instruction>, Vec<u64>) {
             '5' => Instruction::Out(Combo::from_u8(arg)),
             '6' => Instruction::Bdv(Combo::from_u8(arg)),
             '7' => Instruction::Cdv(Combo::from_u8(arg)),
-            _ => panic!("Unknown instruction")
+            _ => panic!("Unknown instruction"),
         });
     }
 
@@ -115,11 +116,10 @@ pub struct Computer {
     reg_b: u64,
     reg_c: u64,
     instructions: Vec<Instruction>,
-    instructions_raw : Vec<u64>,
+    instructions_raw: Vec<u64>,
 }
 
 impl Computer {
-
     fn parse(reg_a: u64, reg_b: u64, reg_c: u64, instructions_str: &str) -> Self {
         let (instructions, instructions_raw) = parse_instructions(instructions_str);
         Computer {
@@ -140,7 +140,7 @@ impl Computer {
             Combo::RegC => self.reg_c,
         }
     }
-    
+
     fn reset(&mut self, reg_a: u64) {
         self.instruction_pointer = 0;
         self.reg_a = reg_a;
@@ -154,7 +154,7 @@ impl Computer {
                 Instruction::Jnz(arg) => {
                     if self.reg_a != 0 {
                         self.instruction_pointer = (*arg / 2) as usize;
-                        continue
+                        continue;
                     }
                 }
 
@@ -162,8 +162,8 @@ impl Computer {
                 Instruction::Bxc => self.reg_b ^= self.reg_c,
                 Instruction::Out(combo) => {
                     self.instruction_pointer += 1;
-                    return Some(self.arg(combo) & 0x7)
-                },
+                    return Some(self.arg(combo) & 0x7);
+                }
                 Instruction::Adv(combo) => self.reg_a.shr_assign(self.arg(combo)),
                 Instruction::Bdv(combo) => self.reg_b = self.reg_a.shr(self.arg(combo)),
                 Instruction::Cdv(combo) => self.reg_c = self.reg_a.shr(self.arg(combo)),
@@ -203,7 +203,7 @@ impl Combo {
             4 => Self::RegA,
             5 => Self::RegB,
             6 => Self::RegC,
-            _ => panic!("Unknown combo")
+            _ => panic!("Unknown combo"),
         }
     }
 }
