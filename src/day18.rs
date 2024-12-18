@@ -1,5 +1,4 @@
 use std::collections::{HashSet, VecDeque};
-use itertools::Itertools;
 use crate::advent::Solver;
 
 // sample input
@@ -8,8 +7,6 @@ use crate::advent::Solver;
 
 const WIDTH_AND_HEIGHT: usize = 71;
 const BYTES: usize = 1024;
-
-const END: usize = WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT - 1;
 
 pub struct Day18;
 
@@ -26,66 +23,36 @@ impl Solver for Day18 {
     }
 
     fn part_1(&self, input: &mut Self::Input) -> String {
-        // oh hey, another bfs
         let mut space = vec![false; WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT];
         for i in input.iter().take(BYTES) {
             space[*i] = true;
         }
         
-        let mut queue : VecDeque<(usize, usize)> = VecDeque::from(vec![(0, 0)]);
+        find_path_breadth_first(&mut space).unwrap().to_string()
         
-        while let Some((coord, steps)) = queue.pop_back() {
-            
-            let s = space.get_mut(coord).unwrap();
-            if *s {
-                continue;
-            }
-            *s = true;
-            
-            if coord == WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT - 1 {
-                return steps.to_string()
-            }
-            
-            for new_coord in next_coord(coord).into_iter().flatten() {
-                queue.push_front((new_coord, steps + 1));
-            }
-        }
-        
-        "not found".to_string()
     }
 
     fn part_2(&self, input: &mut Self::Input) -> String {
-        let mut space = vec![false; WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT];
-
-        let mut path = find_path_breadth_first(&mut space.clone(), END, 0).unwrap();
-        let mut path_hash = path.iter().cloned().collect::<HashSet<usize>>();
+        let mut low = 0;
+        let mut high = input.len() - 1;
         
-        for i in input.iter() {
-            space[*i] = true;
+        while low < high {
+            let mid = (low + high) / 2;
+            let mut space = vec![false; WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT];
+            for i in input.iter().take(mid) {
+                space[*i] = true;
+            }
             
-            if !path_hash.contains(i) {
-                continue;
+            
+            if find_path_breadth_first(&mut space).is_some() {
+                low = mid + 1;
             } else {
-                let pos = path.iter().position(|&x| x == *i).unwrap();
-                
-                let mut before_and_after = path[pos - 1..pos + 2].iter();
-                let before = before_and_after.next().unwrap();
-                before_and_after.next();
-                let after = before_and_after.next().unwrap();
-                if let Some(new_path) = find_path_breadth_first(&mut space.clone(), *after, *before) {
-                    path.splice(pos - 1..pos + 2, new_path.iter().cloned());
-                    path_hash = path.iter().cloned().collect();
-                }  else if let Some(new_path) = find_path_breadth_first(&mut space.clone(), END, 0) {
-                    path = new_path;
-                    path_hash = path.iter().cloned().collect();
-                    
-                } else {
-                    return format!("{},{}", i % WIDTH_AND_HEIGHT, i / WIDTH_AND_HEIGHT);
-                }
+                high = mid;
             }
         }
         
-        "never found".to_string()
+        let v = input[high - 1];
+        format!("{},{}", v % WIDTH_AND_HEIGHT, v / WIDTH_AND_HEIGHT)
     }
 
     fn expected(&self) -> (&'static str, &'static str) {
@@ -111,22 +78,23 @@ fn print_space(space: &[bool], path: &HashSet<usize>) {
     }
 }
 
-fn find_path_breadth_first(squares: &mut [bool], dest: usize, coord: usize) -> Option<Vec<usize>> {
-    let mut queue = VecDeque::from(vec![vec![coord]]);
-    
-    while let Some(path) = queue.pop_front() {
-        let last = *path.last().unwrap();
-        if last == dest {
-            return Some(path);
+
+fn find_path_breadth_first(space: &mut [bool]) -> Option<usize> {
+
+    let mut queue : VecDeque<(usize, usize)> = VecDeque::from(vec![(0, 0)]);
+    while let Some((coord, steps)) = queue.pop_back() {
+        let s = space.get_mut(coord).unwrap();
+        if *s {
+            continue;
         }
-        
-        for new_coord in next_coord(last).into_iter().flatten().sorted_by(|a, b| b.cmp(a)) {
-            if !squares[new_coord] {
-                squares[new_coord] = true;
-                let mut new_path = path.clone();
-                new_path.push(new_coord);
-                queue.push_back(new_path);
-            }
+        *s = true;
+
+        if coord == WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT - 1 {
+            return Some(steps)
+        }
+
+        for new_coord in next_coord(coord).into_iter().flatten() {
+            queue.push_front((new_coord, steps + 1));
         }
     }
     None
