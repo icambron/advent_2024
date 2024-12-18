@@ -18,7 +18,24 @@ impl Solver for Day17 {
         let reg_b: u64 = reg_split.next().unwrap()[12..].parse().unwrap();
         let reg_c: u64 = reg_split.next().unwrap()[12..].parse().unwrap();
 
-        Computer::parse(reg_a, reg_b, reg_c, &ins_txt[9..])
+        let mut ins = ins_txt.chars().skip(9).filter(|c| *c != ',');
+        let mut instructions = vec![];
+        let mut instructions_raw = vec![];
+        while let Some(i) = ins.next() {
+            let arg: u8 = ins.next().unwrap() as u8 - b'0';
+            instructions_raw.push((i as u8 - b'0') as u64);
+            instructions_raw.push(arg as u64);
+            instructions.push(Instruction::parse(i, arg));
+        }
+
+        Computer {
+            reg_a,
+            reg_b,
+            reg_c,
+            instructions,
+            instructions_raw,
+            instruction_pointer: 0,
+        }
     }
 
     fn part_1(&self, computer: &mut Self::Input) -> String {
@@ -82,34 +99,7 @@ impl Ord for Sol {
     }
 }
 
-fn parse_instructions(txt: &str) -> (Vec<Instruction>, Vec<u64>) {
-    let mut ins = txt.chars().filter(|c| *c != ',');
-
-    let mut instructions = vec![];
-    let mut instructions_raw = vec![];
-    while let Some(i) = ins.next() {
-        let arg: u8 = ins.next().unwrap() as u8 - b'0';
-
-        instructions_raw.push((i as u8 - b'0') as u64);
-        instructions_raw.push(arg as u64);
-
-        instructions.push(match i {
-            '0' => Instruction::Adv(Combo::from_u8(arg)),
-            '1' => Instruction::Bxl(arg),
-            '2' => Instruction::Bst(Combo::from_u8(arg)),
-            '3' => Instruction::Jnz(arg),
-            '4' => Instruction::Bxc,
-            '5' => Instruction::Out(Combo::from_u8(arg)),
-            '6' => Instruction::Bdv(Combo::from_u8(arg)),
-            '7' => Instruction::Cdv(Combo::from_u8(arg)),
-            _ => panic!("Unknown instruction"),
-        });
-    }
-
-    (instructions, instructions_raw)
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Computer {
     instruction_pointer: usize,
     reg_a: u64,
@@ -120,18 +110,6 @@ pub struct Computer {
 }
 
 impl Computer {
-    fn parse(reg_a: u64, reg_b: u64, reg_c: u64, instructions_str: &str) -> Self {
-        let (instructions, instructions_raw) = parse_instructions(instructions_str);
-        Computer {
-            reg_a,
-            reg_b,
-            reg_c,
-            instructions,
-            instructions_raw,
-            instruction_pointer: 0,
-        }
-    }
-
     fn arg(&self, arg: &Combo) -> u64 {
         match arg {
             Combo::Literal(v) => *v as u64,
@@ -176,7 +154,7 @@ impl Computer {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 enum Instruction {
     Adv(Combo),
     Bxl(u8),
@@ -188,7 +166,23 @@ enum Instruction {
     Cdv(Combo),
 }
 
-#[derive(Debug, Clone)]
+impl Instruction {
+    fn parse(op_code: char, arg: u8) -> Self {
+        match op_code {
+            '0' => Self::Adv(Combo::from_u8(arg)),
+            '1' => Self::Bxl(arg),
+            '2' => Self::Bst(Combo::from_u8(arg)),
+            '3' => Self::Jnz(arg),
+            '4' => Self::Bxc,
+            '5' => Self::Out(Combo::from_u8(arg)),
+            '6' => Self::Bdv(Combo::from_u8(arg)),
+            '7' => Self::Cdv(Combo::from_u8(arg)),
+            _ => panic!("Unknown instruction"),
+        }
+    }
+}
+
+#[derive(Debug)]
 enum Combo {
     Literal(u8),
     RegA,
