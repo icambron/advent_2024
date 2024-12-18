@@ -9,6 +9,8 @@ use crate::advent::Solver;
 const WIDTH_AND_HEIGHT: usize = 71;
 const BYTES: usize = 1024;
 
+const END: usize = WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT - 1;
+
 pub struct Day18;
 
 impl Solver for Day18 {
@@ -55,17 +57,31 @@ impl Solver for Day18 {
     fn part_2(&self, input: &mut Self::Input) -> String {
         let mut space = vec![false; WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT];
 
-        let mut path = find_path_depth_first(&mut space.clone(), 0).unwrap();
+        let mut path = find_path_breadth_first(&mut space.clone(), END, 0).unwrap();
+        let mut path_hash = path.iter().cloned().collect::<HashSet<usize>>();
         
         for i in input.iter() {
             space[*i] = true;
             
-            if !path.contains(i) {
+            if !path_hash.contains(i) {
                 continue;
-            } else if let Some(new_path) = find_path_depth_first(&mut space.clone(), 0) {
-                path = new_path;
             } else {
-                return format!("{},{}", i % WIDTH_AND_HEIGHT, i / WIDTH_AND_HEIGHT);
+                let pos = path.iter().position(|&x| x == *i).unwrap();
+                
+                let mut before_and_after = path[pos - 1..pos + 2].iter();
+                let before = before_and_after.next().unwrap();
+                before_and_after.next();
+                let after = before_and_after.next().unwrap();
+                if let Some(new_path) = find_path_breadth_first(&mut space.clone(), *after, *before) {
+                    path.splice(pos - 1..pos + 2, new_path.iter().cloned());
+                    path_hash = path.iter().cloned().collect();
+                }  else if let Some(new_path) = find_path_breadth_first(&mut space.clone(), END, 0) {
+                    path = new_path;
+                    path_hash = path.iter().cloned().collect();
+                    
+                } else {
+                    return format!("{},{}", i % WIDTH_AND_HEIGHT, i / WIDTH_AND_HEIGHT);
+                }
             }
         }
         
@@ -95,19 +111,21 @@ fn print_space(space: &[bool], path: &HashSet<usize>) {
     }
 }
 
-// returns path we found
-fn find_path_depth_first(squares: &mut Vec<bool>, coord: usize) -> Option<HashSet<usize>> {
+fn find_path_breadth_first(squares: &mut [bool], dest: usize, coord: usize) -> Option<Vec<usize>> {
+    let mut queue = VecDeque::from(vec![vec![coord]]);
     
-    if coord == WIDTH_AND_HEIGHT * WIDTH_AND_HEIGHT - 1 {
-        return Some(HashSet::new());
-    }
-    
-    for new_coord in next_coord(coord).into_iter().flatten().sorted_by(|a, b| b.cmp(a)) {
-        if !squares[new_coord] {
-            squares[new_coord] = true;
-            if let Some(mut path) = find_path_depth_first(squares, new_coord) {
-                path.insert(new_coord);
-                return Some(path);
+    while let Some(path) = queue.pop_front() {
+        let last = *path.last().unwrap();
+        if last == dest {
+            return Some(path);
+        }
+        
+        for new_coord in next_coord(last).into_iter().flatten().sorted_by(|a, b| b.cmp(a)) {
+            if !squares[new_coord] {
+                squares[new_coord] = true;
+                let mut new_path = path.clone();
+                new_path.push(new_coord);
+                queue.push_back(new_path);
             }
         }
     }
