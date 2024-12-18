@@ -1,3 +1,4 @@
+use std::ops::{Shl, Shr, ShrAssign};
 use itertools::Itertools;
 use crate::advent::{Solver};
 
@@ -11,24 +12,49 @@ impl Solver for Day17 {
         let [reg_text, ins_txt] = split[0..2] else { panic!("Can't parse") };
 
         let mut reg_split = reg_text.lines();
-        let reg_a: i32 = reg_split.next().unwrap()[12..].parse().unwrap();
-        let reg_b: i32 = reg_split.next().unwrap()[12..].parse().unwrap();
-        let reg_c: i32 = reg_split.next().unwrap()[12..].parse().unwrap();
-        
-        Computer::parse(reg_a, reg_b, reg_c, ins_txt)
+        let reg_a: u64 = reg_split.next().unwrap()[12..].parse().unwrap();
+        let reg_b: u64 = reg_split.next().unwrap()[12..].parse().unwrap();
+        let reg_c: u64 = reg_split.next().unwrap()[12..].parse().unwrap();
+
+        Computer::parse(reg_a, reg_b, reg_c, &ins_txt[9..])
     }
 
     fn part_1(&self, computer: &mut Self::Input) -> String {
-        let output = run(computer);
+        let output = run(computer, false);
         output.iter().join(",")
     }
 
-    fn part_2(&self, _input: &mut Self::Input) -> String {
-        "".to_string()
+    fn part_2(&self, computer: &mut Self::Input) -> String {
+
+        let len = computer.instructions_raw.len();
+
+        let mut solutions: Vec<u64> = vec![0];
+
+        for i in (0..len).rev() {
+            let goal = computer.instructions_raw[i];
+            let mut next_solutions = vec![];
+
+            for sol in solutions.iter() {
+                let sol = sol.shl(3);
+                for a in sol..sol + 8 {
+                    computer.reg_a = a;
+                    let output = run(computer, true);
+
+                    if *output.first().unwrap() == goal {
+                        next_solutions.push(a);
+                    }
+                }
+            }
+
+            solutions = next_solutions;
+        }
+
+        solutions.sort();
+        solutions[0].to_string()
     }
 
     fn expected(&self) -> (&'static str, &'static str) {
-        ("", "")
+        ("1,5,0,3,7,3,0,3,1", "105981155568026")
     }
 
     fn name(&self) -> &'static str {
@@ -36,19 +62,14 @@ impl Solver for Day17 {
     }
 }
 
-fn run(computer: &mut Computer) -> Vec<i32> {
+fn run(computer: &mut Computer, halt_at_first_output: bool) -> Vec<u64> {
 
     let mut instruction_pointer: u8 = 0;
-    let mut output: Vec<i32> = vec![];
+    let mut output: Vec<u64> = vec![];
 
     while let Some(i) = computer.instructions.get(instruction_pointer as usize) {
-
-        // println!("instruction pointer: {}", instruction_pointer);
-        // println!("instruction: {:?}", i);
-        // println!("{:?}", computer);
-
         match i {
-            Instruction::Bxl(combo) => computer.reg_b ^= *combo as i32,
+            Instruction::Bxl(arg) => computer.reg_b ^= *arg as u64,
 
             Instruction::Jnz(arg) => {
                 if computer.reg_a != 0 {
@@ -57,35 +78,37 @@ fn run(computer: &mut Computer) -> Vec<i32> {
                 }
             }
 
-            Instruction::Bst(combo) => computer.reg_b = computer.arg(combo) % 8,
-
+            Instruction::Bst(combo) => computer.reg_b = computer.arg(combo) & 0x7,
             Instruction::Bxc => computer.reg_b ^= computer.reg_c,
-
-            Instruction::Out(combo) => output.push(computer.arg(combo) % 8),
-
-            Instruction::Adv(combo) => computer.reg_a /= 2_i32.pow(computer.arg(combo) as u32),
-
-            Instruction::Bdv(combo) => computer.reg_b = computer.reg_a / 2_i32.pow(computer.arg(combo) as u32),
-
-            Instruction::Cdv(combo) => computer.reg_c = computer.reg_a / 2_i32.pow(computer.arg(combo) as u32),
+            Instruction::Out(combo) => {
+                output.push(computer.arg(combo) & 0x7);
+                if halt_at_first_output {
+                    return output;
+                }
+            },
+            Instruction::Adv(combo) => computer.reg_a.shr_assign(computer.arg(combo)),
+            Instruction::Bdv(combo) => computer.reg_b = computer.reg_a.shr(computer.arg(combo)),
+            Instruction::Cdv(combo) => computer.reg_c = computer.reg_a.shr(computer.arg(combo)),
         }
 
         instruction_pointer += 1;
     }
-    
+
     output
 }
 
-fn parse_instructions(txt: &str) -> Vec<Instruction> {
-
+fn parse_instructions(txt: &str) -> (Vec<Instruction>, Vec<u64>) {
     let mut ins = txt.chars()
-        .skip("Program: ".len())
         .filter(|c| *c != ',');
 
 
     let mut instructions = vec![];
+    let mut instructions_raw = vec![];
     while let Some(i) = ins.next() {
         let arg: u8 = ins.next().unwrap() as u8 - b'0';
+
+        instructions_raw.push((i as u8 - b'0') as u64);
+        instructions_raw.push(arg as u64);
 
         instructions.push(match i {
             '0' => Instruction::Adv(Combo::from_u8(arg)),
@@ -99,33 +122,35 @@ fn parse_instructions(txt: &str) -> Vec<Instruction> {
             _ => panic!("Unknown instruction")
         });
     }
-    
-    instructions
+
+    (instructions, instructions_raw)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Computer {
-    reg_a: i32,
-    reg_b: i32,
-    reg_c: i32,
-    instructions: Vec<Instruction>
+    reg_a: u64,
+    reg_b: u64,
+    reg_c: u64,
+    instructions: Vec<Instruction>,
+    instructions_raw : Vec<u64>,
 }
 
 impl Computer {
-    
-    fn parse(reg_a: i32, reg_b: i32, reg_c: i32, instructions_str: &str) -> Self {
-        let instructions = parse_instructions(instructions_str);
+
+    fn parse(reg_a: u64, reg_b: u64, reg_c: u64, instructions_str: &str) -> Self {
+        let (instructions, instructions_raw) = parse_instructions(instructions_str);
         Computer {
             reg_a,
             reg_b,
             reg_c,
-            instructions
+            instructions,
+            instructions_raw,
         }
     }
-    
-    fn arg(&self, arg: &Combo) -> i32 {
+
+    fn arg(&self, arg: &Combo) -> u64 {
         match arg {
-            Combo::Literal(v) => *v as i32,
+            Combo::Literal(v) => *v as u64,
             Combo::RegA => self.reg_a,
             Combo::RegB => self.reg_b,
             Combo::RegC => self.reg_c,
@@ -133,7 +158,7 @@ impl Computer {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Instruction {
     Adv(Combo),
     Bxl(u8),
@@ -145,7 +170,7 @@ enum Instruction {
     Cdv(Combo),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Combo {
     Literal(u8),
     RegA,
@@ -166,44 +191,42 @@ impl Combo {
 }
 
 #[cfg(test)]
-
 mod tests {
     use super::*;
 
     #[test]
     fn test_1() {
-        let mut computer = Computer::parse(0, 0, 9, "Program: 2,6");
-        run(&mut computer);
+        let mut computer = Computer::parse(0, 0, 9, "2,6");
+        run(&mut computer, false);
         assert_eq!(computer.reg_b, 1);
-        
     }
 
     #[test]
     fn test_2() {
-        let mut computer = Computer::parse(10, 0, 0, "Program: 5,0,5,1,5,4");
-        let output = run(&mut computer);
+        let mut computer = Computer::parse(10, 0, 0, "5,0,5,1,5,4");
+        let output = run(&mut computer, false);
         assert_eq!(output, vec![0, 1, 2]);
     }
 
     #[test]
     fn test_3() {
-        let mut computer = Computer::parse(2024, 0, 0, "Program: 0,1,5,4,3,0");
-        let output = run(&mut computer);
+        let mut computer = Computer::parse(2024, 0, 0, "0,1,5,4,3,0");
+        let output = run(&mut computer, false);
         assert_eq!(output, vec![4, 2, 5, 6, 7, 7, 7, 7, 3, 1, 0]);
         assert_eq!(computer.reg_a, 0);
     }
 
     #[test]
     fn test_4() {
-        let mut computer = Computer::parse(0, 29, 0, "Program: 1,7");
-        run(&mut computer);
+        let mut computer = Computer::parse(0, 29, 0, "1,7");
+        run(&mut computer, false);
         assert_eq!(computer.reg_b, 26);
     }
 
     #[test]
     fn test_5() {
-        let mut computer = Computer::parse(0, 2024, 43690, "Program: 4,0");
-        run(&mut computer);
+        let mut computer = Computer::parse(0, 2024, 43690, "4,0");
+        run(&mut computer, false);
         assert_eq!(computer.reg_b, 44354);
     }
 }
