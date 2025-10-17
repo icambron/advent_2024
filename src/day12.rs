@@ -146,7 +146,7 @@ struct Navigation<'a> {
 }
 
 impl Map {
-    fn navigate(&self, coord: usize, expected: char) -> Navigation {
+    fn navigate(&self, coord: usize, expected: char) -> Navigation<'_> {
         let height = self.chars.len() / self.width;
         let x = coord % self.width;
         let y = coord / self.width;

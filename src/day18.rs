@@ -76,7 +76,7 @@ pub struct Memory {
 impl Memory {
     fn next_coord(&self, old_coord: usize) -> [Option<usize>; 4] {
         [
-            if old_coord % self.dimension > 0 {
+            if !old_coord.is_multiple_of(self.dimension) {
                 Some(old_coord - 1)
             } else {
                 None

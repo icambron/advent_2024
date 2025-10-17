@@ -22,6 +22,10 @@ impl Solver for Day17 {
         let mut instructions = vec![];
         let mut instructions_raw = vec![];
         while let Some(i) = ins.next() {
+            if i == '\n' {
+                break;
+            }
+
             let arg: u8 = ins.next().unwrap() as u8 - b'0';
             instructions_raw.push((i as u8 - b'0') as u64);
             instructions_raw.push(arg as u64);

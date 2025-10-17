@@ -50,7 +50,7 @@ impl Solver for Day05 {
                     }
                 });
 
-                middle_page(&page_set)
+                middle_page(page_set)
             })
             .sum::<usize>()
             .to_string()

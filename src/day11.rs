@@ -72,7 +72,7 @@ fn next_stone(stone: u64) -> (u64, Option<u64>) {
 fn split_in_two(num: u64) -> Option<(u64, u64)> {
     let num_digits = ((num as f64).log10() + 1.0) as u32;
 
-    if num_digits % 2 != 0 {
+    if !num_digits.is_multiple_of(2) {
         return None;
     }
 
