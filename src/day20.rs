@@ -1,12 +1,15 @@
 use core::fmt;
-use std::fmt::{Display, Formatter};
+use std::{
+    collections::VecDeque,
+    fmt::{Display, Formatter},
+};
 
 use crate::advent::Solver;
 
 pub struct Day20;
 
 impl Solver for Day20 {
-    type Input = Maze;
+    type Input = (Maze, Vec<usize>);
 
     fn parse(&self, input: &str, is_sample: bool) -> Self::Input {
         let mut width = 0;
@@ -14,7 +17,7 @@ impl Solver for Day20 {
         let mut data = Vec::new();
         let mut start = 0;
 
-        let min_savings = if is_sample { 1 } else { 100 };
+        let min_savings = if is_sample { 50 } else { 100 };
 
         for (y, line) in input.lines().enumerate() {
             width = line.len();
@@ -34,27 +37,30 @@ impl Solver for Day20 {
             height += 1;
         }
 
-        Maze {
+        let mut maze = Maze {
             width,
             height,
             data,
             start,
             min_savings,
-        }
+        };
+
+        let path = update_path(&mut maze);
+
+        (maze, path)
     }
 
     fn part_1(&self, input: &mut Self::Input) -> String {
-        let path = update_path(input);
         // println!("Path: {:?}", path);
-        find_cheats(input, path).to_string()
+        find_cheats(&input.0, &input.1, 2).to_string()
     }
 
-    fn part_2(&self, _input: &mut Self::Input) -> String {
-        todo!()
+    fn part_2(&self, input: &mut Self::Input) -> String {
+        find_cheats(&input.0, &input.1, 20).to_string()
     }
 
     fn expected(&self) -> (&'static str, &'static str) {
-        todo!()
+        ("1307", "986545")
     }
 
     fn name(&self) -> &'static str {
@@ -63,27 +69,25 @@ impl Solver for Day20 {
 }
 
 fn update_path(maze: &mut Maze) -> Vec<usize> {
-    maze.data[maze.start] = Tile::Used(0);
+    maze.data[maze.start] = Tile::Path(0);
 
     let mut i = 0;
     let mut next = Some(maze.start);
     let mut path = vec![maze.start];
 
     while let Some(pos) = next {
-        //println!("examining pos {:?}", pos);
         for neighbor in maze.neighbors(pos) {
-            // println!("examining neighbor {:?}", neighbor);
             match neighbor {
                 Some((new_pos, new_tile)) => match new_tile {
                     Tile::End => {
                         i += 1;
-                        maze.data[new_pos] = Tile::Used(i);
+                        maze.data[new_pos] = Tile::Path(i);
                         path.push(new_pos);
                         return path;
                     }
                     Tile::Empty => {
                         i += 1;
-                        maze.data[new_pos] = Tile::Used(i);
+                        maze.data[new_pos] = Tile::Path(i);
                         path.push(new_pos);
                         next = Some(new_pos);
                         // only one path forward
@@ -98,48 +102,45 @@ fn update_path(maze: &mut Maze) -> Vec<usize> {
         }
     }
 
-    print_maze(maze);
     panic!("Couldn't find the full path")
 }
 
-fn find_cheats(maze: &Maze, path: Vec<usize>) -> u32 {
+fn find_cheats(maze: &Maze, path: &[usize], cheat_max: usize) -> u32 {
     let mut savings = 0;
 
-    for (pre_index, pos) in path.iter().enumerate() {
-        for (cheat_start, tile) in maze.neighbors(*pos).into_iter().flatten() {
-            if tile == Tile::Wall {
-                for (_, cheat_end_tile) in maze.neighbors(cheat_start).into_iter().flatten() {
-                    if let Tile::Used(end_index) = cheat_end_tile {
-                        // println!("Cheating from {} to {}", cheat_start, end_index);
-                        if end_index > pre_index + 2 {
-                            let saved = end_index - pre_index - 2;
-                            if saved >= maze.min_savings {
-                                savings += 1;
-                            }
-                        }
+    let mut mini_queue = VecDeque::new();
+    let mut mini_visited: Vec<isize> = vec![-1; maze.width * maze.height];
+
+    for (start_index, pos) in path.iter().enumerate() {
+        for (neighbor_loc, neighbor_tile) in maze.neighbors(*pos).into_iter().flatten() {
+            mini_queue.push_back((neighbor_loc, neighbor_tile, 1));
+        }
+
+        while let Some((pos, tile, steps)) = mini_queue.pop_front() {
+            if mini_visited[pos] == start_index as isize {
+                continue;
+            }
+
+            mini_visited[pos] = start_index as isize;
+
+            if let Tile::Path(end_index) = tile {
+                if end_index > start_index + steps {
+                    let saved = end_index - start_index - steps;
+                    if saved >= maze.min_savings {
+                        savings += 1;
                     }
+                }
+            }
+
+            if steps < cheat_max {
+                for (neighbor_loc, neighbor_tile) in maze.neighbors(pos).into_iter().flatten() {
+                    mini_queue.push_back((neighbor_loc, neighbor_tile, steps + 1));
                 }
             }
         }
     }
 
     savings
-}
-
-fn print_maze(maze: &Maze) {
-    for y in 0..maze.height {
-        for x in 0..maze.width {
-            let pos = y * maze.width + x;
-            match maze.data[pos] {
-                Tile::Empty => print!("."),
-                Tile::Wall => print!("#"),
-                Tile::Used(_) => print!("X"),
-                Tile::Start => print!("S"),
-                Tile::End => print!("E"),
-            };
-        }
-        println!();
-    }
 }
 
 #[derive(Debug)]
@@ -202,7 +203,7 @@ impl Maze {
 pub enum Tile {
     Wall,
     Empty,
-    Used(usize),
+    Path(usize),
     Start,
     End,
 }
@@ -212,7 +213,7 @@ impl Display for Tile {
         match self {
             Tile::Wall => write!(f, "#"),
             Tile::Empty => write!(f, "."),
-            Tile::Used(_) => write!(f, "."),
+            Tile::Path(_) => write!(f, "."),
             Tile::Start => write!(f, "S"),
             Tile::End => write!(f, "E"),
         }
