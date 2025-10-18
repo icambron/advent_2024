@@ -19,6 +19,7 @@ mod day17;
 mod day18;
 mod day19;
 mod day20;
+mod day21;
 
 use crate::advent::{Advent, Solution, Solvifier};
 use advent::Day;
@@ -120,5 +121,6 @@ fn days() -> Vec<&'static dyn Solvifier> {
         &day18::Day18,
         &day19::Day19,
         &day20::Day20,
+        &day21::Day21,
     ]
 }
