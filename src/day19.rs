@@ -36,7 +36,7 @@ impl Solver for Day19 {
     }
 
     fn expected(&self) -> (&'static str, &'static str) {
-        todo!()
+        ("280", "606411968721181")
     }
 
     fn name(&self) -> &'static str {
