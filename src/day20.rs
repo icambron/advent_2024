@@ -1,8 +1,5 @@
 use core::fmt;
-use std::{
-    collections::VecDeque,
-    fmt::{Display, Formatter},
-};
+use std::fmt::{Display, Formatter};
 
 use crate::advent::Solver;
 
@@ -90,7 +87,6 @@ fn update_path(maze: &mut Maze) -> Vec<usize> {
                         maze.data[new_pos] = Tile::Path(i);
                         path.push(new_pos);
                         next = Some(new_pos);
-                        // only one path forward
                         break;
                     }
                     _ => {
@@ -108,36 +104,17 @@ fn update_path(maze: &mut Maze) -> Vec<usize> {
 fn find_cheats(maze: &Maze, path: &[usize], cheat_max: usize) -> u32 {
     let mut savings = 0;
 
-    let mut mini_queue = VecDeque::new();
-    let mut mini_visited: Vec<isize> = vec![-1; maze.width * maze.height];
-
     for (start_index, pos) in path.iter().enumerate() {
-        for (neighbor_loc, neighbor_tile) in maze.neighbors(*pos).into_iter().flatten() {
-            mini_queue.push_back((neighbor_loc, neighbor_tile, 1));
-        }
-
-        while let Some((pos, tile, steps)) = mini_queue.pop_front() {
-            if mini_visited[pos] == start_index as isize {
-                continue;
-            }
-
-            mini_visited[pos] = start_index as isize;
-
+        maze.for_each_manhattan_tile(*pos, cheat_max, |steps, tile| {
             if let Tile::Path(end_index) = tile {
-                if end_index > start_index + steps {
+                if *end_index > start_index + steps {
                     let saved = end_index - start_index - steps;
                     if saved >= maze.min_savings {
                         savings += 1;
                     }
                 }
             }
-
-            if steps < cheat_max {
-                for (neighbor_loc, neighbor_tile) in maze.neighbors(pos).into_iter().flatten() {
-                    mini_queue.push_back((neighbor_loc, neighbor_tile, steps + 1));
-                }
-            }
-        }
+        });
     }
 
     savings
@@ -196,6 +173,45 @@ impl Maze {
 
     fn tile_at(&self, pos: Option<usize>) -> Option<(usize, Tile)> {
         pos.and_then(|p| self.data.get(p).copied().map(|tile| (p, tile)))
+    }
+
+    pub fn for_each_manhattan_tile<F>(&self, start_pos: usize, range: usize, mut f: F)
+    where
+        F: FnMut(usize, &Tile),
+    {
+        let w = self.width as i32;
+        let h = self.height as i32;
+        let r = range as i32;
+
+        let x0 = (start_pos % self.width) as i32;
+        let y0 = (start_pos / self.width) as i32;
+
+        for dy in -r..=r {
+            let y = y0 + dy;
+            if y < 0 || y >= h {
+                continue;
+            }
+
+            let span = r - dy.abs();
+            let mut x1 = x0 - span;
+            let mut x2 = x0 + span;
+
+            if x1 < 0 {
+                x1 = 0;
+            }
+            if x2 >= w {
+                x2 = w - 1;
+            }
+
+            let y_us = y as usize;
+            let base = y_us * self.width;
+
+            for x in x1 as usize..=x2 as usize {
+                let idx = base + x;
+                let dist = (x as i32 - x0).abs() + dy.abs();
+                f(dist as usize, &self.data[idx]);
+            }
+        }
     }
 }
 
