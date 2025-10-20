@@ -69,7 +69,7 @@ impl Solver for Day22 {
     }
 
     fn expected(&self) -> (&'static str, &'static str) {
-        ("13185239446", "?")
+        ("13185239446", "1501")
     }
 
     fn name(&self) -> &'static str {
