@@ -1,11 +1,12 @@
 use hashbrown::{HashMap, HashSet};
+use itertools::Itertools;
 
 use crate::advent::Solver;
 
 pub struct Day23;
 
 impl Solver for Day23 {
-    type Input = Vec<(String, String)>;
+    type Input = HashSet<(String, String)>;
 
     fn parse(&self, input: &str, _is_sample: bool) -> Self::Input {
         input
@@ -44,15 +45,76 @@ impl Solver for Day23 {
         triplets.len().to_string()
     }
 
-    fn part_2(&self, _input: &mut Self::Input) -> String {
-        todo!()
+    fn part_2(&self, input: &mut Self::Input) -> String {
+        let mut conn_map: HashMap<String, imbl::HashSet<String>> = HashMap::new();
+        for (first, second) in input.iter() {
+            conn_map.entry(first.clone()).or_insert(imbl::HashSet::new()).insert(second.clone());
+            conn_map.entry(second.clone()).or_insert(imbl::HashSet::new()).insert(first.clone());
+        }
+
+        let mut max_found: Option<imbl::HashSet<String>> = None;
+        let mut max_len = 0;
+
+        let empty = imbl::HashSet::new();
+        let mut stack = conn_map
+            .iter()
+            .map(|(node, neighbors)| Candidate {
+                next: node.clone(),
+                path: empty.update(node.clone()),
+                pool: neighbors.update(node.clone()),
+            })
+            .collect::<Vec<_>>();
+
+        let mut visited = HashSet::new();
+
+        while let Some(can) = stack.pop() {
+            if visited.contains(&can.next) {
+                continue;
+            }
+
+            visited.insert(can.next.clone());
+
+            if can.pool.len() < max_len {
+                continue;
+            }
+
+            let neighbors = conn_map.get(&can.next).expect("Node not found in connection map");
+
+            let intersection = neighbors.clone().intersection(can.pool).update(can.next.clone());
+            if intersection.len() <= max_len {
+                continue;
+            }
+
+            let diff = intersection.clone().relative_complement(can.path.clone());
+            if diff.is_empty() {
+                if can.path.len() > max_len {
+                    max_len = can.path.len();
+                    max_found = Some(can.path.clone());
+                }
+            } else {
+                stack.extend(diff.into_iter().map(|node| Candidate {
+                    next: node.clone(),
+                    path: can.path.update(node),
+                    pool: intersection.clone(),
+                }));
+            }
+        }
+        max_found.unwrap().iter().sorted().join(",")
     }
 
     fn expected(&self) -> (&'static str, &'static str) {
-        todo!()
+        ("1476", "co,ef,eu,ff,fh,mt,qi,th,ti,vi,xe,yw")
     }
 
     fn name(&self) -> &'static str {
         "LAN Party"
     }
+}
+
+#[derive(Debug)]
+struct Candidate {
+    // todo represent as numbers?
+    next: String,
+    path: imbl::HashSet<String>,
+    pool: imbl::HashSet<String>,
 }
