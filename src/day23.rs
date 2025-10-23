@@ -22,20 +22,20 @@ impl Solver for Day23 {
     }
 
     fn part_1(&self, input: &mut Self::Input) -> String {
-        let mut conn_map: HashMap<String, HashSet<String>> = HashMap::new();
+        let mut conn_map: HashMap<&str, HashSet<&str>> = HashMap::new();
         for (first, second) in input.iter() {
-            conn_map.entry(first.clone()).or_insert(HashSet::new()).insert(second.clone());
-            conn_map.entry(second.clone()).or_insert(HashSet::new()).insert(first.clone());
+            conn_map.entry(first).or_insert(HashSet::new()).insert(second);
+            conn_map.entry(second).or_insert(HashSet::new()).insert(first);
         }
 
         let mut triplets = HashSet::new();
         for (first, second) in input.iter() {
-            let first_matches = conn_map.get(first).unwrap();
-            let second_matches = conn_map.get(second).unwrap();
+            let first_matches = conn_map.get(first.as_str()).unwrap();
+            let second_matches = conn_map.get(second.as_str()).unwrap();
 
             for third in first_matches.intersection(second_matches) {
                 if first.starts_with('t') || third.starts_with('t') || second.starts_with('t') {
-                    let mut thing = vec![first.clone(), second.clone(), third.clone()];
+                    let mut thing = vec![first, second, *third];
                     thing.sort();
                     triplets.insert(thing);
                 }
@@ -46,41 +46,37 @@ impl Solver for Day23 {
     }
 
     fn part_2(&self, input: &mut Self::Input) -> String {
-        let mut conn_map: HashMap<String, imbl::HashSet<String>> = HashMap::new();
+        let mut conn_map: HashMap<&str, imbl::HashSet<&str>> = HashMap::new();
         for (first, second) in input.iter() {
-            conn_map.entry(first.clone()).or_insert(imbl::HashSet::new()).insert(second.clone());
-            conn_map.entry(second.clone()).or_insert(imbl::HashSet::new()).insert(first.clone());
+            conn_map.entry(first).or_insert(imbl::HashSet::new()).insert(second);
+            conn_map.entry(second).or_insert(imbl::HashSet::new()).insert(first);
         }
 
-        let mut max_found: Option<imbl::HashSet<String>> = None;
+        let mut max_found: Option<imbl::HashSet<&str>> = None;
         let mut max_len = 0;
 
         let empty = imbl::HashSet::new();
         let mut stack = conn_map
             .iter()
             .map(|(node, neighbors)| Candidate {
-                next: node.clone(),
-                path: empty.update(node.clone()),
-                pool: neighbors.update(node.clone()),
+                next: node,
+                path: empty.update(node),
+                pool: neighbors.update(node),
             })
             .collect::<Vec<_>>();
 
         let mut visited = HashSet::new();
 
         while let Some(can) = stack.pop() {
-            if visited.contains(&can.next) {
+            if can.pool.len() < max_len || visited.contains(&can.next) {
                 continue;
             }
 
-            visited.insert(can.next.clone());
-
-            if can.pool.len() < max_len {
-                continue;
-            }
+            visited.insert(can.next);
 
             let neighbors = conn_map.get(&can.next).expect("Node not found in connection map");
 
-            let intersection = neighbors.clone().intersection(can.pool).update(can.next.clone());
+            let intersection = neighbors.clone().intersection(can.pool).update(can.next);
             if intersection.len() <= max_len {
                 continue;
             }
@@ -93,7 +89,7 @@ impl Solver for Day23 {
                 }
             } else {
                 stack.extend(diff.into_iter().map(|node| Candidate {
-                    next: node.clone(),
+                    next: node,
                     path: can.path.update(node),
                     pool: intersection.clone(),
                 }));
@@ -112,9 +108,9 @@ impl Solver for Day23 {
 }
 
 #[derive(Debug)]
-struct Candidate {
+struct Candidate<'a> {
     // todo represent as numbers?
-    next: String,
-    path: imbl::HashSet<String>,
-    pool: imbl::HashSet<String>,
+    next: &'a str,
+    path: imbl::HashSet<&'a str>,
+    pool: imbl::HashSet<&'a str>,
 }
