@@ -99,7 +99,7 @@ impl Solver for Day23 {
     }
 
     fn expected(&self) -> (&'static str, &'static str) {
-        ("1476", "co,ef,eu,ff,fh,mt,qi,th,ti,vi,xe,yw")
+        ("1476", "ca,dw,fo,if,ji,kg,ks,oe,ov,sb,ud,vr,xr")
     }
 
     fn name(&self) -> &'static str {
