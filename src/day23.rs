@@ -95,7 +95,6 @@ impl Solver for Day23 {
                 }
             }
         }
-        println!("Max length: {}", max_len);
         max_found.unwrap().iter().sorted().join(",")
     }
 
