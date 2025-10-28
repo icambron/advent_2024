@@ -48,7 +48,7 @@ impl Solver for Day10 {
     }
 
     fn name(&self) -> &'static str {
-        "Hoof It (topographic map)"
+        "Hoof It"
     }
 }
 

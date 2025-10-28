@@ -87,7 +87,7 @@ impl Solver for Day04 {
     }
 
     fn name(&self) -> &'static str {
-        "Ceres Search (finding XMAS)"
+        "Ceres Search"
     }
 }
 

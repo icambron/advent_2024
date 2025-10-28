@@ -53,6 +53,6 @@ impl Solver for Day01 {
     }
 
     fn name(&self) -> &'static str {
-        "Historian Hysteria (list similarity)"
+        "Historian Hysteria"
     }
 }

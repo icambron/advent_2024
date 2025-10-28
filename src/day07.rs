@@ -29,7 +29,7 @@ impl Solver for Day07 {
     }
 
     fn name(&self) -> &'static str {
-        "Bridge Repair (equations)"
+        "Bridge Repair"
     }
 }
 

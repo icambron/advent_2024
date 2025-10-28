@@ -36,36 +36,36 @@ Then run it:
 
 ```
 ❯ ./target/release/advent_2024 -a -c
-+-----+--------------------------------------+------------+-------------+-------------+------------+
-| Day | Name                                 | Parse (µs) | Part 1 (µs) | Part 2 (µs) | Total (µs) |
-+-----+--------------------------------------+------------+-------------+-------------+------------+
-|   1 | Historian Hysteria (list similarity) |        281 |           0 |          63 |        344 |
-|   2 | Red-Nosed Reports                    |         97 |          10 |          41 |        148 |
-|   3 | Mull It Over                         |        852 |           1 |           1 |        854 |
-|   4 | Ceres Search (finding XMAS)          |         39 |         507 |         287 |        833 |
-|   5 | Print Queue                          |        336 |        3775 |        3635 |       7746 |
-|   6 | Guard Gallivant                      |        136 |         712 |       14525 |      15373 |
-|   7 | Bridge Repair (equations)            |        425 |         285 |        1389 |       2099 |
-|   8 | Resonant Collinearity                |         17 |          19 |         460 |        496 |
-|   9 | Disk Fragmenter                      |        476 |         245 |         171 |        892 |
-|  10 | Hoof It (topographic map)            |        139 |         672 |         639 |       1450 |
-|  11 | Plutonian Pebbles                    |          0 |         671 |        3848 |       4519 |
-|  12 | Garden Groups                        |         31 |         407 |         532 |        970 |
-|  13 | Claw Contraption                     |        139 |           3 |           3 |        145 |
-|  14 | Restroom Rebound                     |        394 |           2 |        7645 |       8041 |
-|  15 | Warehouse Woes                       |         50 |        1268 |        1352 |       2670 |
-|  16 | Reindeer Maze                        |         36 |        2900 |        2765 |       5701 |
-|  17 | Chronospacial Computer               |          1 |           1 |          79 |         81 |
-|  18 | RAM Run                              |        156 |         100 |         211 |        467 |
-|  19 | Linen Layout                         |         54 |       21199 |       29676 |      50929 |
-|  20 | Race Condition                       |         95 |         263 |       16078 |      16436 |
-|  21 | Keypad Conundrum                     |         55 |          11 |          80 |        146 |
-|  22 | Monkey Market                        |         33 |        5743 |       19575 |      25351 |
-|  23 | LAN Party                            |        292 |        1266 |        9206 |      10764 |
-|  24 | Crossed Wires                        |       1934 |          32 |          29 |       1995 |
-|  25 | Code Chronicle                       |         84 |         228 |           0 |        312 |
-+-----+--------------------------------------+------------+-------------+-------------+------------+
-Total: 158.794341ms
++-----+------------------------+------------+-------------+-------------+------------+
+| Day | Name                   | Parse (µs) | Part 1 (µs) | Part 2 (µs) | Total (µs) |
++-----+------------------------+------------+-------------+-------------+------------+
+|   1 | Historian Hysteria     |        141 |           0 |          63 |        204 |
+|   2 | Red-Nosed Reports      |         94 |           9 |          39 |        142 |
+|   3 | Mull It Over           |       1582 |           2 |           3 |       1587 |
+|   4 | Ceres Search           |        111 |         672 |          96 |        879 |
+|   5 | Print Queue            |        111 |        1459 |        3367 |       4937 |
+|   6 | Guard Gallivant        |        164 |         779 |       15479 |      16422 |
+|   7 | Bridge Repair          |        424 |         281 |        1385 |       2090 |
+|   8 | Resonant Collinearity  |         17 |          19 |         471 |        507 |
+|   9 | Disk Fragmenter        |        483 |         245 |         171 |        899 |
+|  10 | Hoof It                |        139 |         657 |         640 |       1436 |
+|  11 | Plutonian Pebbles      |          0 |         775 |        4049 |       4824 |
+|  12 | Garden Groups          |         31 |         411 |         534 |        976 |
+|  13 | Claw Contraption       |        139 |           3 |           3 |        145 |
+|  14 | Restroom Rebound       |        391 |           2 |        7716 |       8109 |
+|  15 | Warehouse Woes         |         38 |         969 |        1022 |       2029 |
+|  16 | Reindeer Maze          |         27 |        2395 |        2959 |       5381 |
+|  17 | Chronospacial Computer |          1 |           1 |          79 |         81 |
+|  18 | RAM Run                |        158 |          98 |         217 |        473 |
+|  19 | Linen Layout           |         53 |       21396 |       29765 |      51214 |
+|  20 | Race Condition         |         92 |         261 |       15868 |      16221 |
+|  21 | Keypad Conundrum       |         32 |           9 |          79 |        120 |
+|  22 | Monkey Market          |         31 |        5711 |       19289 |      25031 |
+|  23 | LAN Party              |        307 |        1244 |        9087 |      10638 |
+|  24 | Crossed Wires          |       1920 |          37 |          30 |       1987 |
+|  25 | Code Chronicle         |         84 |         228 |           0 |        312 |
++-----+------------------------+------------+-------------+-------------+------------+
+Total: 156.678996ms
 ```
 
 Not winning any speed competitions, but pretty good!
