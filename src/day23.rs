@@ -56,45 +56,46 @@ impl Solver for Day23 {
         let mut max_len = 0;
 
         let empty = imbl::HashSet::new();
-        let mut stack = conn_map
-            .iter()
-            .map(|(node, neighbors)| Candidate {
+
+        for (node, neighbors) in conn_map.iter() {
+            let mut stack = vec![Candidate {
                 next: node,
                 path: empty.update(node),
                 pool: neighbors.update(node),
-            })
-            .collect::<Vec<_>>();
+            }];
 
-        let mut visited = HashSet::new();
+            let mut visited = HashSet::new();
 
-        while let Some(can) = stack.pop() {
-            if can.pool.len() < max_len || visited.contains(&can.next) {
-                continue;
-            }
-
-            visited.insert(can.next);
-
-            let neighbors = conn_map.get(&can.next).expect("Node not found in connection map");
-
-            let intersection = neighbors.clone().intersection(can.pool).update(can.next);
-            if intersection.len() <= max_len {
-                continue;
-            }
-
-            let diff = intersection.clone().relative_complement(can.path.clone());
-            if diff.is_empty() {
-                if can.path.len() > max_len {
-                    max_len = can.path.len();
-                    max_found = Some(can.path.clone());
+            while let Some(can) = stack.pop() {
+                if can.pool.len() < max_len || visited.contains(&can.next) {
+                    continue;
                 }
-            } else {
-                stack.extend(diff.into_iter().map(|node| Candidate {
-                    next: node,
-                    path: can.path.update(node),
-                    pool: intersection.clone(),
-                }));
+
+                visited.insert(can.next);
+
+                let neighbors = conn_map.get(&can.next).expect("Node not found in connection map");
+
+                let intersection = neighbors.clone().intersection(can.pool).update(can.next);
+                if intersection.len() <= max_len {
+                    continue;
+                }
+
+                let diff = intersection.clone().relative_complement(can.path.clone());
+                if diff.is_empty() {
+                    if can.path.len() > max_len {
+                        max_len = can.path.len();
+                        max_found = Some(can.path.clone());
+                    }
+                } else {
+                    stack.extend(diff.into_iter().map(|node| Candidate {
+                        next: node,
+                        path: can.path.update(node),
+                        pool: intersection.clone(),
+                    }));
+                }
             }
         }
+        println!("Max length: {}", max_len);
         max_found.unwrap().iter().sorted().join(",")
     }
 
@@ -109,7 +110,6 @@ impl Solver for Day23 {
 
 #[derive(Debug)]
 struct Candidate<'a> {
-    // todo represent as numbers?
     next: &'a str,
     path: imbl::HashSet<&'a str>,
     pool: imbl::HashSet<&'a str>,
